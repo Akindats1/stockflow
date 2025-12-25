@@ -146,6 +146,16 @@ const Icons = {
       <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z" /><circle cx="12" cy="13" r="3" />
     </svg>
   ),
+  Menu: () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="4" x2="20" y1="12" y2="12" /><line x1="4" x2="20" y1="6" y2="6" /><line x1="4" x2="20" y1="18" y2="18" />
+    </svg>
+  ),
+  Upload: () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" x2="12" y1="3" y2="15" />
+    </svg>
+  ),
 };
 
 // API Base URL - in production, this would be your backend server
@@ -194,6 +204,8 @@ export default function InventoryApp() {
   const [showQrModal, setShowQrModal] = useState(false);
   const [qrProduct, setQrProduct] = useState<Product | null>(null);
   const [showScanner, setShowScanner] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [cartExpanded, setCartExpanded] = useState(false);
 
   // Toast notification
   const showToast = (message: string, type: 'success' | 'error' | 'warning' = 'success') => {
@@ -375,8 +387,23 @@ export default function InventoryApp() {
 
   return (
     <div className="app-container">
+      {/* Mobile Menu Toggle */}
+      <button
+        className={`mobile-menu-toggle ${mobileMenuOpen ? 'active' : ''}`}
+        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+        aria-label="Toggle menu"
+      >
+        {mobileMenuOpen ? <Icons.X /> : <Icons.Menu />}
+      </button>
+
+      {/* Mobile Overlay */}
+      <div
+        className={`mobile-overlay ${mobileMenuOpen ? 'active' : ''}`}
+        onClick={() => setMobileMenuOpen(false)}
+      />
+
       {/* Sidebar */}
-      <aside className="sidebar">
+      <aside className={`sidebar ${mobileMenuOpen ? 'mobile-open' : ''}`}>
         <div className="sidebar-logo">
           <div className="sidebar-logo-icon">
             <img src="/images/logo.png" alt="StockFlow" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
@@ -387,35 +414,35 @@ export default function InventoryApp() {
         <nav className="sidebar-nav">
           <button
             className={`nav-item ${activeView === 'dashboard' ? 'active' : ''}`}
-            onClick={() => setActiveView('dashboard')}
+            onClick={() => { setActiveView('dashboard'); setMobileMenuOpen(false); }}
           >
             <Icons.Dashboard />
             <span>Dashboard</span>
           </button>
           <button
             className={`nav-item ${activeView === 'products' ? 'active' : ''}`}
-            onClick={() => setActiveView('products')}
+            onClick={() => { setActiveView('products'); setMobileMenuOpen(false); }}
           >
             <Icons.Package />
             <span>Products</span>
           </button>
           <button
             className={`nav-item ${activeView === 'pos' ? 'active' : ''}`}
-            onClick={() => setActiveView('pos')}
+            onClick={() => { setActiveView('pos'); setMobileMenuOpen(false); }}
           >
             <Icons.ShoppingCart />
             <span>Point of Sale</span>
           </button>
           <button
             className={`nav-item ${activeView === 'sales' ? 'active' : ''}`}
-            onClick={() => setActiveView('sales')}
+            onClick={() => { setActiveView('sales'); setMobileMenuOpen(false); }}
           >
             <Icons.Receipt />
             <span>Sales History</span>
           </button>
           <button
             className={`nav-item ${activeView === 'categories' ? 'active' : ''}`}
-            onClick={() => setActiveView('categories')}
+            onClick={() => { setActiveView('categories'); setMobileMenuOpen(false); }}
           >
             <Icons.Tags />
             <span>Categories</span>
@@ -701,8 +728,8 @@ export default function InventoryApp() {
             </div>
 
             {/* Cart Panel */}
-            <div className="cart-panel">
-              <div className="cart-header">
+            <div className={`cart-panel ${cartExpanded ? 'expanded' : ''}`}>
+              <div className="cart-header" onClick={() => setCartExpanded(!cartExpanded)}>
                 <h3>Current Order</h3>
                 <span className="cart-count">{cartCount} items</span>
               </div>
@@ -1044,14 +1071,41 @@ function ProductModal({
                   required
                 />
               </div>
-              <div className="input-group">
-                <label>Emoji Icon</label>
+              <div className="input-group" style={{ gridColumn: 'span 2' }}>
+                <label>Product Image</label>
+                <div
+                  className={`image-upload-preview ${formData.image ? 'has-image' : ''}`}
+                  onClick={() => document.getElementById('product-image-input')?.click()}
+                >
+                  {formData.image ? (
+                    <img src={formData.image} alt="Product preview" />
+                  ) : (
+                    <div className="upload-placeholder">
+                      <Icons.Upload />
+                      <span style={{ fontSize: '0.875rem' }}>Click to upload image</span>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>PNG, JPG up to 2MB</span>
+                    </div>
+                  )}
+                </div>
                 <input
-                  type="text"
-                  className="input"
-                  value={formData.image || ''}
-                  onChange={e => setFormData({ ...formData, image: e.target.value })}
-                  placeholder="📦"
+                  id="product-image-input"
+                  type="file"
+                  accept="image/*"
+                  style={{ display: 'none' }}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      if (file.size > 2 * 1024 * 1024) {
+                        alert('Image size must be less than 2MB');
+                        return;
+                      }
+                      const reader = new FileReader();
+                      reader.onloadend = () => {
+                        setFormData({ ...formData, image: reader.result as string });
+                      };
+                      reader.readAsDataURL(file);
+                    }
+                  }}
                 />
               </div>
             </div>
@@ -1127,14 +1181,42 @@ function CategoryModal({
                   onChange={e => setFormData({ ...formData, color: e.target.value })}
                 />
               </div>
-              <div className="input-group">
-                <label>Emoji Icon</label>
+              <div className="input-group" style={{ gridColumn: 'span 2' }}>
+                <label>Category Image</label>
+                <div
+                  className={`image-upload-preview ${formData.icon ? 'has-image' : ''}`}
+                  onClick={() => document.getElementById('category-image-input')?.click()}
+                  style={{ height: '160px' }}
+                >
+                  {formData.icon ? (
+                    <img src={formData.icon} alt="Category preview" />
+                  ) : (
+                    <div className="upload-placeholder">
+                      <Icons.Upload />
+                      <span style={{ fontSize: '0.875rem' }}>Click to upload image</span>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>PNG, JPG up to 2MB</span>
+                    </div>
+                  )}
+                </div>
                 <input
-                  type="text"
-                  className="input"
-                  value={formData.icon || ''}
-                  onChange={e => setFormData({ ...formData, icon: e.target.value })}
-                  placeholder="📁"
+                  id="category-image-input"
+                  type="file"
+                  accept="image/*"
+                  style={{ display: 'none' }}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      if (file.size > 2 * 1024 * 1024) {
+                        alert('Image size must be less than 2MB');
+                        return;
+                      }
+                      const reader = new FileReader();
+                      reader.onloadend = () => {
+                        setFormData({ ...formData, icon: reader.result as string });
+                      };
+                      reader.readAsDataURL(file);
+                    }
+                  }}
                 />
               </div>
             </div>
