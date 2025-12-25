@@ -1011,6 +1011,7 @@ function ProductModal({
   categories: Category[];
 }) {
   const [formData, setFormData] = useState<Partial<Product>>({});
+  const [showBarcodeScanner, setShowBarcodeScanner] = useState(false);
 
   useEffect(() => {
     if (product) {
@@ -1023,6 +1024,11 @@ function ProductModal({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSave(formData);
+  };
+
+  const handleBarcodeScan = (barcode: string) => {
+    setFormData({ ...formData, sku: barcode });
+    setShowBarcodeScanner(false);
   };
 
   return (
@@ -1049,12 +1055,24 @@ function ProductModal({
               </div>
               <div className="input-group">
                 <label>SKU</label>
-                <input
-                  type="text"
-                  className="input"
-                  value={formData.sku || ''}
-                  onChange={e => setFormData({ ...formData, sku: e.target.value })}
-                />
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <input
+                    type="text"
+                    className="input"
+                    value={formData.sku || ''}
+                    onChange={e => setFormData({ ...formData, sku: e.target.value })}
+                    placeholder="Enter SKU or scan barcode"
+                    style={{ flex: 1 }}
+                  />
+                  <button
+                    type="button"
+                    className="btn btn-secondary btn-icon"
+                    onClick={() => setShowBarcodeScanner(true)}
+                    title="Scan Barcode"
+                  >
+                    <Icons.Camera />
+                  </button>
+                </div>
               </div>
               <div className="input-group">
                 <label>Category</label>
@@ -1148,6 +1166,13 @@ function ProductModal({
             </button>
           </div>
         </form>
+
+        {/* Barcode Scanner */}
+        <BarcodeScanner
+          isOpen={showBarcodeScanner}
+          onClose={() => setShowBarcodeScanner(false)}
+          onScan={handleBarcodeScan}
+        />
       </div>
     </div>
   );
@@ -1603,6 +1628,95 @@ function ReceiptModal({
         </div>
         <div className="modal-footer">
           <button type="button" className="btn btn-secondary" onClick={onClose}>Close</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Barcode Scanner Component (for adding products)
+function BarcodeScanner({
+  isOpen,
+  onClose,
+  onScan
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  onScan: (barcode: string) => void;
+}) {
+  const scannerRef = useRef<Html5QrcodeScanner | null>(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      // Initialize scanner
+      if (!scannerRef.current) {
+        scannerRef.current = new Html5QrcodeScanner(
+          'barcode-reader',
+          {
+            fps: 10,
+            qrbox: { width: 250, height: 250 },
+            formatsToSupport: [
+              // QR Code
+              0,
+              // Common 1D Barcodes
+              8,  // CODE_128
+              7,  // CODE_39
+              13, // EAN_13
+              14, // EAN_8
+              15, // UPC_A
+              16, // UPC_E
+            ]
+          },
+          false
+        );
+
+        scannerRef.current.render(
+          (decodedText) => {
+            onScan(decodedText);
+            if (scannerRef.current) {
+              scannerRef.current.clear();
+              scannerRef.current = null;
+            }
+          },
+          (error) => {
+            // Ignore errors
+          }
+        );
+      }
+    }
+
+    return () => {
+      if (scannerRef.current) {
+        scannerRef.current.clear().catch(() => { });
+        scannerRef.current = null;
+      }
+    };
+  }, [isOpen, onScan]);
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="modal-overlay active" onClick={onClose} style={{ zIndex: 10000 }}>
+      <div className="modal" onClick={e => e.stopPropagation()} style={{ maxWidth: '600px' }}>
+        <div className="modal-header">
+          <h3>Scan Product Barcode</h3>
+          <button className="modal-close" onClick={onClose}>
+            <Icons.X />
+          </button>
+        </div>
+        <div className="modal-body">
+          <div style={{ marginBottom: '16px', textAlign: 'center' }}>
+            <p style={{ color: 'var(--text-secondary)', marginBottom: '8px' }}>
+              Position the barcode within the camera view to scan
+            </p>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>
+              Supports QR codes, EAN, UPC, CODE_128, CODE_39
+            </p>
+          </div>
+          <div id="barcode-reader" style={{ width: '100%' }}></div>
+        </div>
+        <div className="modal-footer">
+          <button type="button" className="btn btn-secondary" onClick={onClose}>Cancel</button>
         </div>
       </div>
     </div>
