@@ -2,7 +2,12 @@
 
 A professional, full-featured inventory management and point-of-sale system built for small retail stores. Manage products, track sales, generate QR codes, and streamline your business operations with this beautiful, modern web application.
 
-![StockFlow Banner](./public/images/banner.png)
+## 🚀 Live Production App
+
+**Production URL:** Check https://vercel.com/dashboard for your deployed application  
+**Repository:** https://github.com/Akindats1/stockflow  
+**Status:** ✅ Live and Production-Ready  
+**Last Deployed:** December 25, 2025
 
 ## ✨ Features
 
@@ -53,7 +58,7 @@ A professional, full-featured inventory management and point-of-sale system buil
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/stockflow.git
+   git clone https://github.com/Akindats1/stockflow.git
    cd stockflow
    ```
 
@@ -91,7 +96,7 @@ npm run start
 
 ### One-Click Deploy
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/yourusername/stockflow)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/Akindats1/stockflow)
 
 ### Manual Deployment
 
@@ -204,9 +209,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 👨‍💻 Author
 
-**Your Name**
-- GitHub: [@yourusername](https://github.com/yourusername)
-- LinkedIn: [Your Name](https://linkedin.com/in/yourprofile)
+**Akindats1**
+- GitHub: [@Akindats1](https://github.com/Akindats1)
+- Repository: [StockFlow](https://github.com/Akindats1/stockflow)
 
 ## 🙏 Acknowledgments
 
