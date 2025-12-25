@@ -1810,3 +1810,282 @@ h4 {
 /* ============================================
    END PHASE 1 STYLES
    ============================================ */
+/* ============================================
+   PHASE 2: DASHBOARD REDESIGN STYLES
+   ============================================ */
+
+/* Modern Stat Cards */
+.stat-card-modern {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    transition: all var(--transition-fast);
+    box-shadow: var(--shadow-sm);
+}
+
+.stat-card-modern:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--border-hover);
+}
+
+.stat-icon-modern {
+    width: 56px;
+    height: 56px;
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    flex-shrink: 0;
+}
+
+.stat-icon-modern.blue {
+    background: var(--info-bg);
+    color: var(--info);
+}
+
+.stat-icon-modern.green {
+    background: var(--success-bg);
+    color: var(--success);
+}
+
+.stat-icon-modern.orange {
+    background: var(--warning-bg);
+    color: var(--warning);
+}
+
+.stat-icon-modern.purple {
+    background: #F3E8FF;
+    color: var(--accent-secondary);
+}
+
+.stat-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.stat-value {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1;
+}
+
+.stat-trend {
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    margin-top: 4px;
+}
+
+.stat-trend.positive {
+    color: var(--success);
+}
+
+.stat-trend.negative {
+    color: var(--danger);
+}
+
+.stat-trend.neutral {
+    color: var(--text-muted);
+}
+
+/* Dashboard Grid Layout */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 20px;
+    margin-bottom: 32px;
+}
+
+.dashboard-section {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 0;
+    overflow: hidden;
+    box-shadow: var--shadow-sm);
+}
+
+.dashboard-section-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border-light);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.dashboard-section-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.dashboard-section-action {
+    font-size: 0.875rem;
+    color: var(--accent-primary);
+    text-decoration: none;
+    font-weight: 500;
+    cursor: pointer;
+    transition: color var(--transition-fast);
+}
+
+.dashboard-section-action:hover {
+    color: var(--accent-primary-hover);
+}
+
+.dashboard-section-body {
+    padding: 0;
+}
+
+/* Quick Actions Grid */
+.quick-actions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+}
+
+.quick-action-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    box-shadow: var(--shadow-sm);
+}
+
+.quick-action-card:hover {
+    background: var(--bg-hover);
+    border-color: var(--accent-primary);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.quick-action-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-md);
+    background: var(--accent-primary-light);
+    color: var(--accent-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.quick-action-content {
+    flex: 1;
+}
+
+.quick-action-title {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 2px;
+}
+
+.quick-action-desc {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+/* Dashboard Tables */
+.dashboard-table-container {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.dashboard-table-container .data-table-modern {
+    font-size: 0.8125rem;
+}
+
+.dashboard-table-container .data-table-modern td {
+    padding: 10px 16px;
+}
+
+/* Empty State for Dashboard */
+.dashboard-empty {
+    padding: 40px 20px;
+    text-align: center;
+    color: var(--text-muted);
+}
+
+.dashboard-empty svg {
+    width: 48px;
+    height: 48px;
+    margin-bottom: 12px;
+    opacity: 0.5;
+}
+
+.dashboard-empty h4 {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+}
+
+.dashboard-empty p {
+    font-size: 0.8125rem;
+}
+
+/* Two Column Dashboard Layout */
+.dashboard-two-column {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 20px;
+    margin-bottom: 32px;
+}
+
+@media (max-width: 1024px) {
+    .dashboard-two-column {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Responsive Dashboard */
+@media (max-width: 768px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .stat-card-modern {
+        padding: 16px;
+    }
+
+    .stat-icon-modern {
+        width: 48px;
+        height: 48px;
+        font-size: 20px;
+    }
+
+    .stat-value {
+        font-size: 1.5rem;
+    }
+
+    .quick-actions-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ============================================
+   END PHASE 2 STYLES
+   ============================================ */
