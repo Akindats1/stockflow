@@ -469,401 +469,422 @@ export default function InventoryApp() {
       {/* Main Content */}
       <main className="main-content">
         {/* Dashboard View */}
-        {
-          activeView === 'dashboard' && (
-            <div>
-              <div className="page-header">
-                <div className="page-title">
-                  <h1>Dashboard</h1>
-                  <p>Welcome back! Here's what's happening with your store.</p>
+        {activeView === 'dashboard' && (
+          <div>
+            <div className="page-header">
+              <div className="page-title">
+                <h1>Dashboard</h1>
+                <p>Welcome back! Here&apos;s what&apos;s happening with your store.</p>
+              </div>
+            </div>
+
+            {/* Stats Grid */}
+            <div className="stats-grid">
+              <div className="glass-card stat-card">
+                <div className="stat-icon blue">
+                  <Icons.DollarSign />
+                </div>
+                <div className="stat-content">
+                  <div className="stat-value">₦{dashboardStats.totalRevenue.toFixed(2)}</div>
+                  <div className="stat-label">Total Revenue</div>
+                  <div className="stat-change positive">↑ 12.5% from last week</div>
                 </div>
               </div>
 
-              {/* Stats Grid - Modern Cards */}
-              <div className="dashboard-grid">
-                <div className="stat-card-modern">
-                  <div className="stat-icon-modern blue">
-                    <Icons.DollarSign />
-                  </div>
-                  <div className="stat-details">
-                    <span className="stat-label">Total Revenue</span>
-                    <span className="stat-value">₦{dashboardStats.totalRevenue.toFixed(2)}</span>
-                    <span className="stat-trend positive">↑ 12.5%</span>
-                  </div>
+              <div className="glass-card stat-card">
+                <div className="stat-icon purple">
+                  <Icons.Box />
                 </div>
-
-                <div className="stat-card-modern">
-                  <div className="stat-icon-modern purple">
-                    <Icons.Box />
-                  </div>
-                  <div className="stat-details">
-                    <span className="stat-label">Total Products</span>
-                    <span className="stat-value">{dashboardStats.totalProducts}</span>
-                    <span className="stat-trend neutral">—</span>
-                  </div>
-                </div>
-
-                <div className="stat-card-modern">
-                  <div className="stat-icon-modern green">
-                    <Icons.ShoppingBag />
-                  </div>
-                  <div className="stat-details">
-                    <span className="stat-label">Today's Sales</span>
-                    <span className="stat-value">{dashboardStats.todaySales}</span>
-                    <span className="stat-trend positive">↑ 8%</span>
-                  </div>
-                </div>
-
-                <div className="stat-card-modern">
-                  <div className="stat-icon-modern orange">
-                    <Icons.AlertTriangle />
-                  </div>
-                  <div className="stat-details">
-                    <span className="stat-label">Low Stock Items</span>
-                    <span className="stat-value">{dashboardStats.lowStockCount}</span>
-                    {dashboardStats.lowStockCount > 0 && (
-                      <span className="stat-trend negative">Needs attention</span>
-                    )}
-                  </div>
+                <div className="stat-content">
+                  <div className="stat-value">{dashboardStats.totalProducts}</div>
+                  <div className="stat-label">Total Products</div>
                 </div>
               </div>
 
-              {/* Two Column Layout - Recent Sales & Low Stock */}
-              <div className="dashboard-two-column">
-                {/* Recent Sales Table */}
-                <div className="dashboard-section">
-                  <div className="dashboard-section-header">
-                    <h3 className="dashboard-section-title">Recent Sales</h3>
-                    <a className="dashboard-section-action" onClick={() => setActiveView('sales')}>
-                      View All
-                    </a>
-                  </div>
-                  <div className="dashboard-section-body">
-                    <div className="dashboard-table-container">
-                      <table className="data-table-modern">
-                        <thead>
-                          <tr>
-                            <th>Sale ID</th>
-                            <th>Date</th>
-                            <th>Time</th>
-                            <th>Payment</th>
-                            <th>Total</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {dashboardStats.recentSales.slice(0, 5).map(sale => (
-                            <tr key={sale.id}>
-                              <td style={{ fontWeight: 600 }}>#{sale.id}</td>
-                              <td>{new Date(sale.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</td>
-                              <td style={{ color: 'var(--text-secondary)' }}>
-                                {new Date(sale.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
-                              </td>
-                              <td>
-                                <span className="status-badge active" style={{ fontSize: '0.6875rem', padding: '2px 8px' }}>
-                                  {sale.payment_method}
-                                </span>
-                              </td>
-                              <td style={{ fontWeight: 600 }}>₦{sale.total.toFixed(2)}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                      {dashboardStats.recentSales.length === 0 && (
-                        <div className="dashboard-empty">
-                          <Icons.ShoppingBag />
-                          <h4>No sales yet</h4>
-                          <p>Sales will appear here</p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
+              <div className="glass-card stat-card">
+                <div className="stat-icon green">
+                  <Icons.ShoppingBag />
                 </div>
-
-                {/* Low Stock Alert Table */}
-                <div className="dashboard-section">
-                  <div className="dashboard-section-header">
-                    <h3 className="dashboard-section-title">Low Stock Alert</h3>
-                    <a className="dashboard-section-action" onClick={() => setActiveView('products')}>
-                      View All
-                    </a>
-                  </div>
-                  <div className="dashboard-section-body">
-                    <div className="dashboard-table-container">
-                      <table className="data-table-modern">
-                        <thead>
-                          <tr>
-                            <th>Product</th>
-                            <th>Stock</th>
-                            <th>Status</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {products.filter(p => p.stock <= 10).slice(0, 5).map(product => (
-                            <tr key={product.id}>
-                              <td>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                  <img
-                                    src={product.image}
-                                    alt={product.name}
-                                    className="product-thumbnail"
-                                    style={{ width: '32px', height: '32px' }}
-                                  />
-                                  <span style={{ fontWeight: 500 }}>{product.name}</span>
-                                </div>
-                              </td>
-                              <td style={{ fontWeight: 600 }}>{product.stock} units</td>
-                              <td>
-                                <span className={`status-badge ${product.stock <= 5 ? 'out-of-stock' : 'low-stock'}`}>
-                                  {product.stock <= 5 ? 'Critical' : 'Low'}
-                                </span>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                      {products.filter(p => p.stock <= 10).length === 0 && (
-                        <div className="dashboard-empty">
-                          <Icons.Package />
-                          <h4>All products well stocked!</h4>
-                          <p>No low stock items</p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
+                <div className="stat-content">
+                  <div className="stat-value">{dashboardStats.todaySales}</div>
+                  <div className="stat-label">Today&apos;s Sales</div>
                 </div>
               </div>
 
-              {/* Quick Actions */}
-              <div style={{ marginTop: '32px' }}>
-                <h3 style={{ marginBottom: '16px', fontSize: '1.125rem', fontWeight: 600 }}>Quick Actions</h3>
-                <div className="quick-actions-grid">
-                  <div className="quick-action-card" onClick={() => { setActiveView('products'); setEditingProduct(null); setShowModal(true); }}>
-                    <div className="quick-action-icon">
-                      <Icons.Plus />
-                    </div>
-                    <div className="quick-action-content">
-                      <div className="quick-action-title">Add Product</div>
-                      <div className="quick-action-desc">Add new item to inventory</div>
-                    </div>
-                  </div>
-
-                  <div className="quick-action-card" onClick={() => setActiveView('pos')}>
-                    <div className="quick-action-icon">
-                      <Icons.ShoppingBag />
-                    </div>
-                    <div className="quick-action-content">
-                      <div className="quick-action-title">New Sale</div>
-                      <div className="quick-action-desc">Process a new transaction</div>
-                    </div>
-                  </div>
-
-                  <div className="quick-action-card" onClick={() => setActiveView('sales')}>
-                    <div className="quick-action-icon">
-                      <Icons.Receipt />
-                    </div>
-                    <div className="quick-action-content">
-                      <div className="quick-action-title">View Reports</div>
-                      <div className="quick-action-desc">Sales history & analytics</div>
-                    </div>
-                  </div>
-
-                  <div className="quick-action-card" onClick={() => setActiveView('categories')}>
-                    <div className="quick-action-icon">
-                      <Icons.Tags />
-                    </div>
-                    <div className="quick-action-content">
-                      <div className="quick-action-title">Manage Categories</div>
-                      <div className="quick-action-desc">Organize your products</div>
-                    </div>
-                  </div>
+              <div className="glass-card stat-card">
+                <div className="stat-icon orange">
+                  <Icons.AlertTriangle />
+                </div>
+                <div className="stat-content">
+                  <div className="stat-value">{dashboardStats.lowStockCount}</div>
+                  <div className="stat-label">Low Stock Items</div>
+                  {dashboardStats.lowStockCount > 0 && (
+                    <div className="stat-change negative">Needs attention</div>
+                  )}
                 </div>
               </div>
             </div>
-          )
-        }
 
-        {/* Products View */}
-        {
-          activeView === 'products' && (
-            <div>
-              <div className="page-header">
-                <div className="page-title">
-                  <h1>Products</h1>
-                  <p>Manage your inventory</p>
-                </div>
-                <div style={{ display: 'flex', gap: '8px' }}>
-                  <button className="btn-export" onClick={() => alert('Export functionality coming soon!')}>
-                    <Icons.Download />
-                    Export
-                  </button>
-                  <button className="btn btn-primary" onClick={() => { setEditingProduct(null); setShowModal(true); }}>
-                    <Icons.Plus /> New Product
-                  </button>
+            {/* Recent Sales & Low Stock */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+              <div className="glass-card" style={{ padding: '24px' }}>
+                <h3 style={{ marginBottom: '16px', background: 'none', WebkitTextFillColor: 'var(--text-primary)' }}>Recent Sales</h3>
+                <div className="table-container" style={{ border: 'none' }}>
+                  <table className="data-table">
+                    <thead>
+                      <tr>
+                        <th>ID</th>
+                        <th>Amount</th>
+                        <th>Time</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {dashboardStats.recentSales.map(sale => (
+                        <tr key={sale.id}>
+                          <td>#{sale.id}</td>
+                          <td>₦{sale.total.toFixed(2)}</td>
+                          <td>{new Date(sale.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               </div>
 
-              {/* Table Container */}
-              <div className="products-table-container">
-                {/* Table Header Controls */}
-                <div className="table-header-controls">
-                  <div className="table-search-container">
-                    <div style={{ position: 'relative', flex: '1', maxWidth: '400px' }}>
-                      <input
-                        type="text"
-                        className="input"
-                        placeholder="Search products..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        style={{ paddingLeft: '40px' }}
-                      />
-                      <span style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }}>
-                        <Icons.Search />
+              <div className="glass-card" style={{ padding: '24px' }}>
+                <h3 style={{ marginBottom: '16px', background: 'none', WebkitTextFillColor: 'var(--text-primary)' }}>Low Stock Alert</h3>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  {products.filter(p => p.stock <= 10).map(product => (
+                    <div key={product.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px', background: 'var(--bg-glass)', borderRadius: 'var(--radius-md)' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <img src={product.image} alt={product.name} style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: 'var(--radius-sm)' }} />
+                        <span>{product.name}</span>
+                      </div>
+                      <span className={`badge ${product.stock <= 5 ? 'badge-danger' : 'badge-warning'}`}>
+                        {product.stock} left
                       </span>
                     </div>
-                    <button className="filter-toggle">
-                      Filters
-                      <span style={{ fontSize: '10px' }}>▾</span>
+                  ))}
+                  {products.filter(p => p.stock <= 10).length === 0 && (
+                    <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '20px' }}>All products are well stocked!</p>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Products View */}
+        {activeView === 'products' && (
+          <div>
+            <div className="page-header">
+              <div className="page-title">
+                <h1>Products</h1>
+                <p>Manage your inventory</p>
+              </div>
+              <button className="btn btn-primary" onClick={() => { setEditingProduct(null); setShowModal(true); }}>
+                <Icons.Plus /> Add Product
+              </button>
+            </div>
+
+            {/* Search and Filter */}
+            <div style={{ display: 'flex', gap: '12px', marginBottom: '24px', flexWrap: 'wrap' }}>
+              <div style={{ position: 'relative', flex: '1', minWidth: '200px' }}>
+                <input
+                  type="text"
+                  className="input"
+                  placeholder="Search products..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  style={{ paddingLeft: '40px' }}
+                />
+                <span style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }}>
+                  <Icons.Search />
+                </span>
+              </div>
+              <div className="pos-categories">
+                <button
+                  className={`category-chip ${selectedCategory === null ? 'active' : ''}`}
+                  onClick={() => setSelectedCategory(null)}
+                >
+                  All
+                </button>
+                {categories.map(cat => (
+                  <button
+                    key={cat.id}
+                    className={`category-chip ${selectedCategory === cat.id ? 'active' : ''}`}
+                    onClick={() => setSelectedCategory(cat.id)}
+                  >
+                    <img src={cat.icon} alt={cat.name} style={{ width: '20px', height: '20px', marginRight: '6px' }} />
+                    {cat.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Products Grid */}
+            <div className="product-grid">
+              {filteredProducts.map(product => (
+                <div key={product.id} className="glass-card product-card">
+                  <div className="product-image">
+                    <img src={product.image} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <span className={`product-badge ${product.stock <= 10 ? 'low-stock' : 'in-stock'}`}>
+                      {product.stock <= 10 ? 'Low Stock' : 'In Stock'}
+                    </span>
+                  </div>
+                  <div className="product-info">
+                    <div className="product-category">{product.category_name}</div>
+                    <div className="product-name">{product.name}</div>
+                    <div className="product-meta">
+                      <span className="product-price">₦{product.price.toFixed(2)}</span>
+                      <span className="product-stock">{product.stock} units</span>
+                    </div>
+                  </div>
+                  <div className="product-actions">
+                    <button
+                      className="btn btn-primary btn-icon"
+                      onClick={() => handleShowQR(product)}
+                      title="View QR Code"
+                    >
+                      <Icons.QrCode />
+                    </button>
+                    <button
+                      className="btn btn-secondary btn-icon"
+                      onClick={() => { setEditingProduct(product); setShowModal(true); }}
+                    >
+                      <Icons.Edit />
+                    </button>
+                    <button
+                      className="btn btn-danger btn-icon"
+                      onClick={() => handleDeleteProduct(product.id)}
+                    >
+                      <Icons.Trash />
                     </button>
                   </div>
-                  <div className="pos-categories" style={{ flex: '1', justifyContent: 'flex-start' }}>
-                    <button
-                      className={`category-chip ${selectedCategory === null ? 'active' : ''}`}
-                      onClick={() => setSelectedCategory(null)}
-                    >
-                      All
-                    </button>
-                    {categories.map(cat => (
+                </div>
+              ))}
+            </div>
+
+            {filteredProducts.length === 0 && (
+              <div className="empty-state">
+                <Icons.Package />
+                <h3>No products found</h3>
+                <p>Try adjusting your search or add a new product</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* POS View */}
+        {activeView === 'pos' && (
+          <div className="pos-container">
+            <div className="pos-products">
+              <div className="page-title" style={{ marginBottom: '16px' }}>
+                <h1>Point of Sale</h1>
+                <p>Select products to add to cart</p>
+              </div>
+
+              {/* Search */}
+              <div className="pos-search" style={{ display: 'flex', gap: '12px' }}>
+                <input
+                  type="text"
+                  className="input"
+                  placeholder="Search products..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  style={{ flex: 1 }}
+                />
+                <button
+                  className="btn btn-primary"
+                  onClick={() => setShowScanner(true)}
+                  title="Scan QR Code"
+                >
+                  <Icons.Camera />
+                  <span>Scan QR</span>
+                </button>
+              </div>
+
+              {/* Categories */}
+              <div className="pos-categories">
+                <button
+                  className={`category-chip ${selectedCategory === null ? 'active' : ''}`}
+                  onClick={() => setSelectedCategory(null)}
+                >
+                  All
+                </button>
+                {categories.map(cat => (
+                  <button
+                    key={cat.id}
+                    className={`category-chip ${selectedCategory === cat.id ? 'active' : ''}`}
+                    onClick={() => setSelectedCategory(cat.id)}
+                  >
+                    <img src={cat.icon} alt={cat.name} style={{ width: '20px', height: '20px', marginRight: '6px' }} />
+                    {cat.name}
+                  </button>
+                ))}
+              </div>
+
+              {/* Product Grid */}
+              <div className="pos-product-grid">
+                {filteredProducts.map(product => (
+                  <div
+                    key={product.id}
+                    className="glass-card pos-product-card"
+                    onClick={() => addToCart(product)}
+                    style={{ opacity: product.stock <= 0 ? 0.5 : 1 }}
+                  >
+                    <div className="pos-product-image">
+                      <img src={product.image} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    </div>
+                    <div className="pos-product-name">{product.name}</div>
+                    <div className="pos-product-price">₦{product.price.toFixed(2)}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Cart Panel */}
+            <div className={`cart-panel ${cartExpanded ? 'expanded' : ''}`}>
+              <div className="cart-header" onClick={() => setCartExpanded(!cartExpanded)}>
+                <h3>Current Order</h3>
+                <span className="cart-count">{cartCount} items</span>
+              </div>
+
+              <div className="cart-items">
+                {cart.length === 0 ? (
+                  <div className="cart-empty">
+                    <Icons.ShoppingCart />
+                    <p>Your cart is empty</p>
+                    <p style={{ fontSize: '0.875rem' }}>Add products to get started</p>
+                  </div>
+                ) : (
+                  cart.map(item => (
+                    <div key={item.id} className="cart-item">
+                      <div className="cart-item-image">
+                        <img src={item.image} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      </div>
+                      <div className="cart-item-details">
+                        <div className="cart-item-name">{item.name}</div>
+                        <div className="cart-item-price">₦{(item.price * item.quantity).toFixed(2)}</div>
+                      </div>
+                      <div className="cart-item-qty">
+                        <button className="qty-btn" onClick={() => updateCartQuantity(item.id, -1)}>
+                          <Icons.Minus />
+                        </button>
+                        <span>{item.quantity}</span>
+                        <button className="qty-btn" onClick={() => updateCartQuantity(item.id, 1)}>
+                          <Icons.Plus />
+                        </button>
+                      </div>
                       <button
-                        key={cat.id}
-                        className={`category-chip ${selectedCategory === cat.id ? 'active' : ''}`}
-                        onClick={() => setSelectedCategory(cat.id)}
+                        className="btn btn-icon"
+                        style={{ background: 'transparent', color: 'var(--danger)' }}
+                        onClick={() => removeFromCart(item.id)}
                       >
-                        {cat.name}
+                        <Icons.X />
                       </button>
-                    ))}
+                    </div>
+                  ))
+                )}
+              </div>
+
+              <div className="cart-footer">
+                <div className="cart-summary">
+                  <div className="cart-row">
+                    <span>Subtotal</span>
+                    <span>₦{cartTotal.toFixed(2)}</span>
+                  </div>
+                  <div className="cart-row">
+                    <span>Tax (0%)</span>
+                    <span>₦0.00</span>
+                  </div>
+                  <div className="cart-row total">
+                    <span>Total</span>
+                    <span>₦{cartTotal.toFixed(2)}</span>
                   </div>
                 </div>
 
-                {/* Products Table */}
-                <table className="data-table-modern">
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                  <button
+                    className="btn btn-secondary"
+                    style={{ flex: 1, minWidth: '100px' }}
+                    onClick={() => completeSale('Cash')}
+                    disabled={cart.length === 0}
+                  >
+                    💵 Cash
+                  </button>
+                  <button
+                    className="btn btn-primary"
+                    style={{ flex: 1, minWidth: '100px' }}
+                    onClick={() => completeSale('Card')}
+                    disabled={cart.length === 0}
+                  >
+                    💳 Card
+                  </button>
+                  <button
+                    className="btn btn-success"
+                    style={{ flex: 1, minWidth: '100px' }}
+                    onClick={() => completeSale('Transfer')}
+                    disabled={cart.length === 0}
+                  >
+                    🏦 Transfer
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Sales History View */}
+        {activeView === 'sales' && (
+          <div>
+            <div className="page-header">
+              <div className="page-title">
+                <h1>Sales History</h1>
+                <p>View all transactions</p>
+              </div>
+            </div>
+
+            <div className="glass-card">
+              <div className="table-container" style={{ border: 'none' }}>
+                <table className="data-table">
                   <thead>
                     <tr>
-                      <th>
-                        <input type="checkbox" className="table-checkbox" />
-                      </th>
-                      <th>Product</th>
-                      <th>Category</th>
-                      <th>SKU</th>
-                      <th>Price</th>
-                      <th>Stock</th>
-                      <th>Status</th>
-                      <th></th>
+                      <th>Sale ID</th>
+                      <th>Date & Time</th>
+                      <th>Payment</th>
+                      <th>Discount</th>
+                      <th>Total</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredProducts.map(product => (
-                      <tr key={product.id}>
+                    {sales.map(sale => (
+                      <tr key={sale.id}>
+                        <td>#{sale.id}</td>
+                        <td>{new Date(sale.created_at).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</td>
                         <td>
-                          <input type="checkbox" className="table-checkbox" />
-                        </td>
-                        <td>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                            <img
-                              src={product.image}
-                              alt={product.name}
-                              className="product-thumbnail"
-                            />
-                            <span style={{ fontWeight: 500 }}>{product.name}</span>
-                          </div>
-                        </td>
-                        <td>
-                          <span style={{
-                            textTransform: 'uppercase',
-                            fontSize: '0.75rem',
-                            fontWeight: 600,
-                            color: 'var(--text-secondary)'
-                          }}>
-                            {product.category_name}
+                          <span className="badge badge-success">
+                            {sale.payment_method === 'Cash' ? '💵' : sale.payment_method === 'Card' ? '💳' : '🏦'} {sale.payment_method}
                           </span>
                         </td>
-                        <td style={{ color: 'var(--text-secondary)' }}>{product.sku}</td>
-                        <td style={{ fontWeight: 600 }}>₦{product.price.toFixed(2)}</td>
-                        <td>{product.stock} units</td>
-                        <td>
-                          <span className={`status-badge ${product.stock <= 0 ? 'out-of-stock' : product.stock <= 10 ? 'low-stock' : 'active'}`}>
-                            {product.stock <= 0 ? 'Out of Stock' : product.stock <= 10 ? 'Low Stock' : 'Active'}
-                          </span>
-                        </td>
-                        <td>
-                          <div className="table-action-menu">
-                            <button
-                              className="action-menu-trigger"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                const menu = e.currentTarget.nextElementSibling as HTMLElement;
-                                menu?.classList.toggle('active');
-                              }}
-                            >
-                              ⋮
-                            </button>
-                            <div className="action-menu-dropdown">
-                              <button
-                                className="action-menu-item"
-                                onClick={() => { setEditingProduct(product); setShowModal(true); }}
-                              >
-                                <Icons.Edit />
-                                Edit
-                              </button>
-                              <button
-                                className="action-menu-item"
-                                onClick={() => handleShowQR(product)}
-                              >
-                                <Icons.QrCode />
-                                QR Code
-                              </button>
-                              <button
-                                className="action-menu-item danger"
-                                onClick={() => handleDeleteProduct(product.id)}
-                              >
-                                <Icons.Trash />
-                                Delete
-                              </button>
-                            </div>
-                          </div>
-                        </td>
+                        <td>₦{sale.discount.toFixed(2)}</td>
+                        <td style={{ fontWeight: 600, color: 'var(--accent-primary)' }}>₦{sale.total.toFixed(2)}</td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
-
-                {filteredProducts.length === 0 && (
-                  <div className="empty-state" style={{ padding: '60px 20px' }}>
-                    <Icons.Package />
-                    <h3>No products found</h3>
-                    <p>Try adjusting your search or add a new product</p>
-                  </div>
-                )}
-
-                {/* Pagination */}
-                {filteredProducts.length > 0 && (
-                  <div className="pagination">
-                    <button className="pagination-button" disabled>
-                      ←
-                    </button>
-                    <button className="pagination-button active">1</button>
-                    <button className="pagination-button">2</button>
-                    <button className="pagination-button">3</button>
-                    <span style={{ padding: '0 8px', color: 'var(--text-muted)' }}>...</span>
-                    <button className="pagination-button">{Math.ceil(filteredProducts.length / 10)}</button>
-                    <button className="pagination-button">
-                      →
-                    </button>
-                  </div>
-                )}
               </div>
             </div>
-          )
-        }
+
+            {sales.length === 0 && (
+              <div className="empty-state">
+                <Icons.Receipt />
+                <h3>No sales yet</h3>
+                <p>Complete your first sale to see it here</p>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Categories View */}
         {activeView === 'categories' && (
