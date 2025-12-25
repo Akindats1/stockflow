@@ -1484,4 +1484,329 @@ h4 {
   .modal {
     max-height: 85vh;
   }
+}/* ============================================
+   PHASE 1: PROFESSIONAL TABLE DESIGN STYLES
+   ============================================ */
+
+/* Products Table Container */
+.products-table-container {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
 }
+
+/* Clean Data Table */
+.data-table-modern {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+}
+
+.data-table-modern thead {
+    background: var(--bg-tertiary);
+    border-bottom: 2px solid var(--border-color);
+}
+
+.data-table-modern thead th {
+    padding: 12px 16px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+
+.data-table-modern thead th:first-child {
+    width: 40px;
+    text-align: center;
+}
+
+.data-table-modern tbody tr {
+    border-bottom: 1px solid var(--border-light);
+    transition: background var(--transition-fast);
+}
+
+.data-table-modern tbody tr:nth-child(even) {
+    background: var(--bg-table-stripe);
+}
+
+.data-table-modern tbody tr:hover {
+    background: var(--bg-hover);
+}
+
+.data-table-modern tbody td {
+    padding: 12px 16px;
+    vertical-align: middle;
+    color: var(--text-primary);
+}
+
+.data-table-modern tbody td:first-child {
+    text-align: center;
+}
+
+/* Product Thumbnail in Table */
+.product-thumbnail {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-sm);
+    object-fit: cover;
+    border: 1px solid var(--border-light);
+}
+
+/* Status Badges */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: var(--radius-full);
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: capitalize;
+    white-space: nowrap;
+}
+
+.status-badge.active {
+    background: var(--success-bg);
+    color: var(--success);
+}
+
+.status-badge.out-of-stock {
+    background: var(--danger-bg);
+    color: var(--danger);
+}
+
+.status-badge.low-stock {
+    background: var(--warning-bg);
+    color: var(--warning);
+}
+
+/* Table Action Menu */
+.table-action-menu {
+    position: relative;
+    display: inline-block;
+}
+
+.action-menu-trigger {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-fast);
+}
+
+.action-menu-trigger:hover {
+    background: var(--bg-hover);
+    border-color: var(--border-color);
+    color: var(--text-secondary);
+}
+
+.action-menu-dropdown {
+    position: absolute;
+    right: 0;
+    top: 100%;
+    margin-top: 4px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    min-width: 160px;
+    z-index: 100;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: all var(--transition-fast);
+}
+
+.action-menu-dropdown.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.action-menu-item {
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    font-size: 0.875rem;
+    border: none;
+    background: transparent;
+    width: 100%;
+    text-align: left;
+}
+
+.action-menu-item:hover {
+    background: var(--bg-hover);
+}
+
+.action-menu-item.danger {
+    color: var(--danger);
+}
+
+.action-menu-item.danger:hover {
+    background: var(--danger-light);
+}
+
+/* Pagination */
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 16px;
+    border-top: 1px solid var(--border-light);
+}
+
+.pagination-button {
+    min-width: 32px;
+    height: 32px;
+    padding: 0 8px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-color);
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pagination-button:hover:not(:disabled) {
+    background: var(--bg-hover);
+    border-color: var(--border-hover);
+}
+
+.pagination-button.active {
+    background: var(--accent-primary);
+    border-color: var(--accent-primary);
+    color: white;
+    font-weight: 600;
+}
+
+.pagination-button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* Table Header Controls */
+.table-header-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 16px;
+    border-bottom: 1px solid var(--border-light);
+    flex-wrap: wrap;
+}
+
+.table-search-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    min-width: 300px;
+}
+
+.table-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Filter Dropdown Toggle */
+.filter-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.filter-toggle:hover {
+    background: var(--bg-hover);
+    border-color: var(--border-hover);
+}
+
+/* Export Button */
+.btn-export {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.btn-export:hover {
+    background: var(--bg-hover);
+    border-color: var(--border-hover);
+}
+
+/* Checkbox Styling */
+.table-checkbox {
+    width: 16px;
+    height: 16px;
+    border-radius: var(--radius-sm);
+    border: 1.5px solid var(--border-hover);
+    cursor: pointer;
+    accent-color: var(--accent-primary);
+}
+
+/* Responsive Table */
+@media (max-width: 1024px) {
+    .products-table-container {
+        overflow-x: auto;
+    }
+
+    .data-table-modern {
+        min-width: 900px;
+    }
+}
+
+/* Mobile: Fall back to cards */
+@media (max-width: 767px) {
+    .data-table-modern {
+        display: none;
+    }
+
+    .mobile-product-cards {
+        display: block;
+    }
+}
+
+@media (min-width: 768px) {
+    .mobile-product-cards {
+        display: none;
+    }
+}
+
+/* ============================================
+   END PHASE 1 STYLES
+   ============================================ */
