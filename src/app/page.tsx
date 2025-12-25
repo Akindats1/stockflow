@@ -156,6 +156,16 @@ const Icons = {
       <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" x2="12" y1="3" y2="15" />
     </svg>
   ),
+  Printer: () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" /><path d="M6 9V3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6" /><rect x="6" y="14" width="12" height="8" rx="1" />
+    </svg>
+  ),
+  Download: () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" x2="12" y1="15" y2="3" />
+    </svg>
+  ),
 };
 
 // API Base URL - in production, this would be your backend server
@@ -206,6 +216,8 @@ export default function InventoryApp() {
   const [showScanner, setShowScanner] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [cartExpanded, setCartExpanded] = useState(false);
+  const [showReceipt, setShowReceipt] = useState(false);
+  const [currentReceipt, setCurrentReceipt] = useState<Sale | null>(null);
 
   // Toast notification
   const showToast = (message: string, type: 'success' | 'error' | 'warning' = 'success') => {
@@ -356,6 +368,10 @@ export default function InventoryApp() {
       })),
     };
     setSales(prev => [newSale, ...prev]);
+
+    // Show receipt
+    setCurrentReceipt(newSale);
+    setShowReceipt(true);
     setCart([]);
     showToast(`Sale completed: ₦${cartTotal.toFixed(2)}`, 'success');
   };
@@ -788,10 +804,10 @@ export default function InventoryApp() {
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', gap: '8px' }}>
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                   <button
                     className="btn btn-secondary"
-                    style={{ flex: 1 }}
+                    style={{ flex: 1, minWidth: '100px' }}
                     onClick={() => completeSale('Cash')}
                     disabled={cart.length === 0}
                   >
@@ -799,11 +815,19 @@ export default function InventoryApp() {
                   </button>
                   <button
                     className="btn btn-primary"
-                    style={{ flex: 1 }}
+                    style={{ flex: 1, minWidth: '100px' }}
                     onClick={() => completeSale('Card')}
                     disabled={cart.length === 0}
                   >
                     💳 Card
+                  </button>
+                  <button
+                    className="btn btn-success"
+                    style={{ flex: 1, minWidth: '100px' }}
+                    onClick={() => completeSale('Transfer')}
+                    disabled={cart.length === 0}
+                  >
+                    🏦 Transfer
                   </button>
                 </div>
               </div>
@@ -840,7 +864,7 @@ export default function InventoryApp() {
                         <td>{new Date(sale.created_at).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</td>
                         <td>
                           <span className="badge badge-success">
-                            {sale.payment_method === 'Cash' ? '💵' : '💳'} {sale.payment_method}
+                            {sale.payment_method === 'Cash' ? '💵' : sale.payment_method === 'Card' ? '💳' : '🏦'} {sale.payment_method}
                           </span>
                         </td>
                         <td>₦{sale.discount.toFixed(2)}</td>
@@ -948,6 +972,13 @@ export default function InventoryApp() {
         isOpen={showScanner}
         onClose={() => setShowScanner(false)}
         onScan={handleScanResult}
+      />
+
+      {/* Receipt Modal */}
+      <ReceiptModal
+        isOpen={showReceipt}
+        onClose={() => setShowReceipt(false)}
+        sale={currentReceipt}
       />
 
       {/* Toast Notifications */}
@@ -1387,6 +1418,191 @@ function ScannerModal({
         </div>
         <div className="modal-footer">
           <button type="button" className="btn btn-secondary" onClick={onClose}>Cancel</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Receipt Modal Component
+function ReceiptModal({
+  isOpen,
+  onClose,
+  sale
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  sale: Sale | null;
+}) {
+  const receiptRef = useRef<HTMLDivElement>(null);
+
+  const handlePrint = () => {
+    if (receiptRef.current) {
+      const printWindow = window.open('', '', 'height=600,width=800');
+      if (printWindow) {
+        printWindow.document.write('<html><head><title>Receipt</title>');
+        printWindow.document.write('<style>');
+        printWindow.document.write(`
+          body { font-family: 'Courier New', monospace; padding: 20px; }
+          .receipt { max-width: 400px; margin: 0 auto; }
+          .receipt-header { text-align: center; margin-bottom: 20px; border-bottom: 2px dashed #000; padding-bottom: 10px; }
+          .receipt-header h2 { margin: 0; font-size: 24px; }
+          .receipt-header p { margin: 5px 0; font-size: 12px; }
+          .receipt-items { margin: 20px 0; }
+          .receipt-item { display: flex; justify-content: space-between; margin: 10px 0; }
+          .receipt-item-name { flex: 1; }
+          .receipt-item-qty { width: 50px; text-align: center; }
+          .receipt-item-price { width: 80px; text-align: right; }
+          .receipt-divider { border-top: 1px dashed #000; margin: 10px 0; }
+          .receipt-total { border-top: 2px solid #000; padding-top: 10px; margin-top: 10px; }
+          .receipt-row { display: flex; justify-content: space-between; margin: 5px 0; }
+          .receipt-row.total { font-weight: bold; font-size: 18px; }
+          .receipt-footer { text-align: center; margin-top: 20px; padding-top: 10px; border-top: 2px dashed #000; font-size: 12px; }
+          @media print { body { padding: 0; } }
+        `);
+        printWindow.document.write('</style></head><body>');
+        printWindow.document.write(receiptRef.current.innerHTML);
+        printWindow.document.write('</body></html>');
+        printWindow.document.close();
+        printWindow.print();
+      }
+    }
+  };
+
+  const handleDownload = () => {
+    if (receiptRef.current && sale) {
+      const content = receiptRef.current.innerText;
+      const blob = new Blob([content], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `receipt-${sale.id}.txt`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+  };
+
+  if (!sale) return null;
+
+  return (
+    <div className={`modal-overlay ${isOpen ? 'active' : ''}`} onClick={onClose}>
+      <div className="modal" onClick={e => e.stopPropagation()} style={{ maxWidth: '500px' }}>
+        <div className="modal-header">
+          <h3>Receipt</h3>
+          <button className="modal-close" onClick={onClose}>
+            <Icons.X />
+          </button>
+        </div>
+        <div className="modal-body">
+          <div ref={receiptRef} style={{
+            fontFamily: "'Courier New', monospace",
+            backgroundColor: '#fff',
+            color: '#000',
+            padding: '20px',
+            borderRadius: '8px'
+          }}>
+            {/* Receipt Header */}
+            <div style={{ textAlign: 'center', marginBottom: '20px', borderBottom: '2px dashed #000', paddingBottom: '10px' }}>
+              <h2 style={{ margin: '0 0 10px 0', fontSize: '24px', color: '#000' }}>StockFlow</h2>
+              <p style={{ margin: '5px 0', fontSize: '12px' }}>Inventory Management System</p>
+              <p style={{ margin: '5px 0', fontSize: '12px' }}>Tel: +234 XXX XXX XXXX</p>
+              <p style={{ margin: '5px 0', fontSize: '12px' }}>Email: sales@stockflow.com</p>
+            </div>
+
+            {/* Sale Info */}
+            <div style={{ marginBottom: '20px', fontSize: '12px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', margin: '5px 0' }}>
+                <span>Receipt #:</span>
+                <span style={{ fontWeight: 'bold' }}>{sale.id}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', margin: '5px 0' }}>
+                <span>Date:</span>
+                <span>{new Date(sale.created_at).toLocaleDateString()}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', margin: '5px 0' }}>
+                <span>Time:</span>
+                <span>{new Date(sale.created_at).toLocaleTimeString()}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', margin: '5px 0' }}>
+                <span>Payment:</span>
+                <span style={{ fontWeight: 'bold' }}>{sale.payment_method}</span>
+              </div>
+            </div>
+
+            <div style={{ borderTop: '1px dashed #000', margin: '10px 0' }} />
+
+            {/* Items */}
+            <div style={{ marginBottom: '20px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', fontWeight: 'bold', marginBottom: '10px', fontSize: '12px', color: '#000' }}>
+                <span>Item</span>
+                <span style={{ textAlign: 'center' }}>Qty</span>
+                <span style={{ textAlign: 'right' }}>Price</span>
+              </div>
+              {sale.items && sale.items.map(item => (
+                <div key={item.id} style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', margin: '8px 0', fontSize: '12px', color: '#000' }}>
+                  <span>{item.product_name}</span>
+                  <span style={{ textAlign: 'center' }}>{item.quantity}</span>
+                  <span style={{ textAlign: 'right' }}>₦{(item.price * item.quantity).toFixed(2)}</span>
+                </div>
+              ))}
+            </div>
+
+            <div style={{ borderTop: '2px solid #000', paddingTop: '10px', marginTop: '10px' }}>
+              {/* Totals */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', margin: '8px 0', fontSize: '14px', color: '#000' }}>
+                <span>Subtotal:</span>
+                <span>₦{sale.total.toFixed(2)}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', margin: '8px 0', fontSize: '14px', color: '#000' }}>
+                <span>Discount:</span>
+                <span>₦{sale.discount.toFixed(2)}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', margin: '8px 0', fontSize: '14px', color: '#000' }}>
+                <span>Tax (0%):</span>
+                <span>₦0.00</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', margin: '12px 0', fontSize: '18px', fontWeight: 'bold', color: '#000' }}>
+                <span>TOTAL:</span>
+                <span>₦{sale.total.toFixed(2)}</span>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div style={{ textAlign: 'center', marginTop: '20px', paddingTop: '10px', borderTop: '2px dashed #000', fontSize: '12px' }}>
+              <p style={{ margin: '5px 0' }}>Thank you for your business!</p>
+              <p style={{ margin: '5px 0' }}>Please come again</p>
+              <p style={{ margin: '10px 0 5px', fontSize: '11px' }}>
+                Powered by StockFlow Inventory System
+              </p>
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div style={{ display: 'flex', gap: '12px', marginTop: '20px' }}>
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={handlePrint}
+              style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+            >
+              <Icons.Printer />
+              Print Receipt
+            </button>
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={handleDownload}
+              style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+            >
+              <Icons.Download />
+              Download
+            </button>
+          </div>
+        </div>
+        <div className="modal-footer">
+          <button type="button" className="btn btn-secondary" onClick={onClose}>Close</button>
         </div>
       </div>
     </div>
