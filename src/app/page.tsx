@@ -181,14 +181,42 @@ const initialCategories: Category[] = [
 ];
 
 const initialProducts: Product[] = [
-  { id: 1, name: 'Wireless Earbuds', sku: 'WE-001', category_id: 1, category_name: 'Electronics', price: 49.99, cost: 25.00, stock: 45, image: '/images/products/wireless-earbuds.png', created_at: new Date().toISOString() },
-  { id: 2, name: 'Smart Watch', sku: 'SW-002', category_id: 1, category_name: 'Electronics', price: 199.99, cost: 120.00, stock: 12, image: '/images/products/smart-watch.png', created_at: new Date().toISOString() },
-  { id: 3, name: 'Cotton T-Shirt', sku: 'CT-001', category_id: 2, category_name: 'Clothing', price: 24.99, cost: 8.00, stock: 100, image: '/images/products/cotton-tshirt.png', created_at: new Date().toISOString() },
-  { id: 4, name: 'Denim Jeans', sku: 'DJ-001', category_id: 2, category_name: 'Clothing', price: 59.99, cost: 25.00, stock: 50, image: '/images/products/denim-jeans.png', created_at: new Date().toISOString() },
-  { id: 5, name: 'Energy Drink', sku: 'ED-001', category_id: 3, category_name: 'Food & Drinks', price: 3.99, cost: 1.50, stock: 200, image: '/images/products/energy-drink.png', created_at: new Date().toISOString() },
-  { id: 6, name: 'Protein Bar', sku: 'PB-001', category_id: 3, category_name: 'Food & Drinks', price: 2.49, cost: 0.80, stock: 3, image: '/images/products/protein-bar.png', created_at: new Date().toISOString() },
-  { id: 7, name: 'LED Desk Lamp', sku: 'DL-001', category_id: 4, category_name: 'Home & Garden', price: 34.99, cost: 15.00, stock: 25, image: '/images/products/led-desk-lamp.png', created_at: new Date().toISOString() },
-  { id: 8, name: 'Face Moisturizer', sku: 'FM-001', category_id: 5, category_name: 'Health & Beauty', price: 18.99, cost: 6.00, stock: 8, image: '/images/products/face-moisturizer.png', created_at: new Date().toISOString() },
+  // Food & Groceries
+  { id: 1, name: 'Golden Penny Semovita 1kg', sku: 'GP-SEM-001', category_id: 3, category_name: 'Food & Drinks', price: 1250, cost: 900, stock: 80, image: '/images/products/semovita.png', created_at: new Date().toISOString() },
+  { id: 2, name: 'Uncle Ben\'s Parboiled Rice 50kg', sku: 'UB-RICE-50', category_id: 3, category_name: 'Food & Drinks', price: 42000, cost: 38000, stock: 25, image: '/images/products/rice-bag.png', created_at: new Date().toISOString() },
+  { id: 3, name: 'Honeywell Wheat Flour 2kg', sku: 'HW-FLR-002', category_id: 3, category_name: 'Food & Drinks', price: 2100, cost: 1600, stock: 60, image: '/images/products/wheat-flour.png', created_at: new Date().toISOString() },
+  { id: 4, name: 'Ijebu Garri 1.5kg', sku: 'IJ-GAR-015', category_id: 3, category_name: 'Food & Drinks', price: 850, cost: 600, stock: 120, image: '/images/products/garri.png', created_at: new Date().toISOString() },
+  { id: 5, name: 'Peak Powdered Milk 900g', sku: 'PK-MLK-900', category_id: 3, category_name: 'Food & Drinks', price: 4500, cost: 3800, stock: 45, image: '/images/products/peak-milk.png', created_at: new Date().toISOString() },
+  { id: 6, name: 'Mama Gold Rice 25kg', sku: 'MG-RICE-25', category_id: 3, category_name: 'Food & Drinks', price: 21500, cost: 19000, stock: 18, image: '/images/products/mama-gold-rice.png', created_at: new Date().toISOString() },
+
+  // Beverages
+  { id: 7, name: 'Malta Guinness Can 33cl', sku: 'MG-CAN-033', category_id: 3, category_name: 'Food & Drinks', price: 350, cost: 250, stock: 200, image: '/images/products/malta-guinness.png', created_at: new Date().toISOString() },
+  { id: 8, name: 'Coca-Cola 50cl Pet Bottle', sku: 'CC-PET-050', category_id: 3, category_name: 'Food & Drinks', price: 300, cost: 200, stock: 150, image: '/images/products/coca-cola.png', created_at: new Date().toISOString() },
+  { id: 9, name: 'Milo Activ-Go 400g', sku: 'ML-ACT-400', category_id: 3, category_name: 'Food & Drinks', price: 1850, cost: 1400, stock: 55, image: '/images/products/milo.png', created_at: new Date().toISOString() },
+  { id: 10, name: 'Bournvita 500g', sku: 'BV-500', category_id: 3, category_name: 'Food & Drinks', price: 2200, cost: 1700, stock: 40, image: '/images/products/bournvita.png', created_at: new Date().toISOString() },
+
+  // Clothing & Fashion
+  { id: 11, name: 'Ankara Fabric 6 Yards', sku: 'ANK-FAB-006', category_id: 2, category_name: 'Clothing', price: 4500, cost: 3000, stock: 35, image: '/images/products/ankara-fabric.png', created_at: new Date().toISOString() },
+  { id: 12, name: 'Adire Tie-Dye Shirt', sku: 'ADR-SHT-001', category_id: 2, category_name: 'Clothing', price: 5500, cost: 3500, stock: 20, image: '/images/products/adire-shirt.png', created_at: new Date().toISOString() },
+  { id: 13, name: 'Agbada Complete Set', sku: 'AGB-SET-001', category_id: 2, category_name: 'Clothing', price: 25000, cost: 18000, stock: 8, image: '/images/products/agbada.png', created_at: new Date().toISOString() },
+  { id: 14, name: 'Gele (Head Tie)', sku: 'GEL-HT-001', category_id: 2, category_name: 'Clothing', price: 2500, cost: 1500, stock: 50, image: '/images/products/gele.png', created_at: new Date().toISOString() },
+
+  // Electronics
+  { id: 15, name: 'itel Mobile Phone A60', sku: 'ITL-A60', category_id: 1, category_name: 'Electronics', price: 45000, cost: 38000, stock: 15, image: '/images/products/itel-phone.png', created_at: new Date().toISOString() },
+  { id: 16, name: 'Oraimo Power Bank 10000mAh', sku: 'ORM-PB-10K', category_id: 1, category_name: 'Electronics', price: 8500, cost: 6000, stock: 30, image: '/images/products/power-bank.png', created_at: new Date().toISOString() },
+  { id: 17, name: 'Rechargeable Fan 18"', sku: 'RF-18-001', category_id: 1, category_name: 'Electronics', price: 22000, cost: 17000, stock: 12, image: '/images/products/rechargeable-fan.png', created_at: new Date().toISOString() },
+
+  // Health & Beauty
+  { id: 18, name: 'Dettol Antiseptic 500ml', sku: 'DET-ANT-500', category_id: 5, category_name: 'Health & Beauty', price: 1800, cost: 1200, stock: 70, image: '/images/products/dettol.png', created_at: new Date().toISOString() },
+  { id: 19, name: 'Dudu Osun Black Soap', sku: 'DDO-BLK-001', category_id: 5, category_name: 'Health & Beauty', price: 650, cost: 400, stock: 95, image: '/images/products/dudu-osun.png', created_at: new Date().toISOString() },
+  { id: 20, name: 'Ori (Shea Butter) 500g', sku: 'ORI-SB-500', category_id: 5, category_name: 'Health & Beauty', price: 1200, cost: 800, stock: 60, image: '/images/products/shea-butter.png', created_at: new Date().toISOString() },
+
+  // Home & Garden
+  { id: 21, name: 'Cooking Gas Cylinder 6kg', sku: 'CGC-06KG', category_id: 4, category_name: 'Home & Garden', price: 11500, cost: 9500, stock: 10, image: '/images/products/gas-cylinder.png', created_at: new Date().toISOString() },
+  { id: 22, name: 'Aba Made Shoes (Men)', sku: 'ABA-SH-M01', category_id: 2, category_name: 'Clothing', price: 7500, cost: 5000, stock: 25, image: '/images/products/aba-shoes.png', created_at: new Date().toISOString() },
+  { id: 23, name: 'Plastic Cooler 50L', sku: 'PLC-CLR-50', category_id: 4, category_name: 'Home & Garden', price: 8500, cost: 6000, stock: 18, image: '/images/products/cooler.png', created_at: new Date().toISOString() },
+  { id: 24, name: 'Indomie Noodles Carton (40 pcs)', sku: 'IND-NDL-C40', category_id: 3, category_name: 'Food & Drinks', price: 5200, cost: 4500, stock: 35, image: '/images/products/indomie.png', created_at: new Date().toISOString() },
+  { id: 25, name: 'Palm Oil 5 Litres', sku: 'PLM-OIL-005', category_id: 3, category_name: 'Food & Drinks', price: 6500, cost: 5500, stock: 28, image: '/images/products/palm-oil.png', created_at: new Date().toISOString() },
 ];
 
 const initialSales: Sale[] = [
