@@ -941,11 +941,11 @@ export default function InventoryApp() {
             </div>
 
             {/* Barcode Scanner */}
-            {showScanner && (
-              <div className="glass-card" style={{ marginBottom: '24px', padding: '20px' }}>
-                <BarcodeScanner onScan={handleScanResult} />
-              </div>
-            )}
+            <BarcodeScanner
+              isOpen={showScanner}
+              onClose={() => setShowScanner(false)}
+              onScan={handleScanResult}
+            />
 
             <div style={{ display: 'grid', gridTemplateColumns: cartExpanded ? '1fr 400px' : '1fr 350px', gap: '24px' }}>
               {/* Products Grid */}
