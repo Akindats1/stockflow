@@ -242,8 +242,6 @@ export default function InventoryApp() {
   const [showQrModal, setShowQrModal] = useState(false);
   const [qrProduct, setQrProduct] = useState<Product | null>(null);
   const [showScanner, setShowScanner] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [cartExpanded, setCartExpanded] = useState(false);
   const [showReceipt, setShowReceipt] = useState(false);
   const [currentReceipt, setCurrentReceipt] = useState<Sale | null>(null);
 
@@ -459,62 +457,45 @@ export default function InventoryApp() {
 
   return (
     <div className="app-container">
-      {/* Mobile Menu Toggle */}
-      <button
-        className={`mobile-menu-toggle ${mobileMenuOpen ? 'active' : ''}`}
-        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-        aria-label="Toggle menu"
-      >
-        {mobileMenuOpen ? <Icons.X /> : <Icons.Menu />}
-      </button>
-
-      {/* Mobile Overlay */}
-      <div
-        className={`mobile-overlay ${mobileMenuOpen ? 'active' : ''}`}
-        onClick={() => setMobileMenuOpen(false)}
-      />
-
-      {/* Sidebar */}
-      <aside className={`sidebar ${mobileMenuOpen ? 'mobile-open' : ''}`}>
+      {/* Desktop Sidebar - Hidden on Mobile */}
+      <aside className="sidebar">
         <div className="sidebar-logo">
-          <div className="sidebar-logo-icon">
-            <img src="/images/logo.png" alt="StockFlow" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-          </div>
+          <div className="sidebar-logo-icon">S</div>
           <span className="sidebar-logo-text">StockFlow</span>
         </div>
 
         <nav className="sidebar-nav">
           <button
             className={`nav-item ${activeView === 'dashboard' ? 'active' : ''}`}
-            onClick={() => { setActiveView('dashboard'); setMobileMenuOpen(false); }}
+            onClick={() => setActiveView('dashboard')}
           >
             <Icons.Dashboard />
             <span>Dashboard</span>
           </button>
           <button
             className={`nav-item ${activeView === 'products' ? 'active' : ''}`}
-            onClick={() => { setActiveView('products'); setMobileMenuOpen(false); }}
+            onClick={() => setActiveView('products')}
           >
             <Icons.Package />
             <span>Products</span>
           </button>
           <button
             className={`nav-item ${activeView === 'pos' ? 'active' : ''}`}
-            onClick={() => { setActiveView('pos'); setMobileMenuOpen(false); }}
+            onClick={() => setActiveView('pos')}
           >
             <Icons.ShoppingCart />
             <span>Point of Sale</span>
           </button>
           <button
             className={`nav-item ${activeView === 'sales' ? 'active' : ''}`}
-            onClick={() => { setActiveView('sales'); setMobileMenuOpen(false); }}
+            onClick={() => setActiveView('sales')}
           >
             <Icons.Receipt />
-            <span>Sales History</span>
+            <span>Sales</span>
           </button>
           <button
             className={`nav-item ${activeView === 'categories' ? 'active' : ''}`}
-            onClick={() => { setActiveView('categories'); setMobileMenuOpen(false); }}
+            onClick={() => setActiveView('categories')}
           >
             <Icons.Tags />
             <span>Categories</span>
@@ -947,7 +928,7 @@ export default function InventoryApp() {
               onScan={handleScanResult}
             />
 
-            <div style={{ display: 'grid', gridTemplateColumns: cartExpanded ? '1fr 400px' : '1fr 350px', gap: '24px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '24px' }}>
               {/* Products Grid */}
               <div>
                 {/* Category Filter */}
@@ -1365,6 +1346,50 @@ export default function InventoryApp() {
           </div>
         ))}
       </div>
+
+      {/* Mobile Bottom Navigation */}
+      <nav className="mobile-bottom-nav">
+        <button
+          className={`mobile-nav-item ${activeView === 'dashboard' ? 'active' : ''}`}
+          onClick={() => setActiveView('dashboard')}
+        >
+          <div className="nav-indicator"></div>
+          <Icons.Dashboard />
+          <span>Home</span>
+        </button>
+        <button
+          className={`mobile-nav-item ${activeView === 'products' ? 'active' : ''}`}
+          onClick={() => setActiveView('products')}
+        >
+          <div className="nav-indicator"></div>
+          <Icons.Package />
+          <span>Products</span>
+        </button>
+        <button
+          className={`mobile-nav-item ${activeView === 'pos' ? 'active' : ''}`}
+          onClick={() => setActiveView('pos')}
+        >
+          <div className="nav-indicator"></div>
+          <Icons.ShoppingCart />
+          <span>POS</span>
+        </button>
+        <button
+          className={`mobile-nav-item ${activeView === 'sales' ? 'active' : ''}`}
+          onClick={() => setActiveView('sales')}
+        >
+          <div className="nav-indicator"></div>
+          <Icons.Receipt />
+          <span>Sales</span>
+        </button>
+        <button
+          className={`mobile-nav-item ${activeView === 'categories' ? 'active' : ''}`}
+          onClick={() => setActiveView('categories')}
+        >
+          <div className="nav-indicator"></div>
+          <Icons.Tags />
+          <span>More</span>
+        </button>
+      </nav>
     </div>
   );
 }
