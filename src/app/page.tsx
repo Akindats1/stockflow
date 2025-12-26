@@ -921,6 +921,344 @@ export default function InventoryApp() {
           )
         }
 
+        {/* POS View */}
+        {activeView === 'pos' && (
+          <div>
+            <div className="page-header">
+              <div className="page-title">
+                <h1>Point of Sale</h1>
+                <p>Process transactions and manage sales</p>
+              </div>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button
+                  className="btn btn-secondary"
+                  onClick={() => setShowScanner(!showScanner)}
+                >
+                  <Icons.Camera />
+                  {showScanner ? 'Close Scanner' : 'Scan Barcode'}
+                </button>
+              </div>
+            </div>
+
+            {/* Barcode Scanner */}
+            {showScanner && (
+              <div className="glass-card" style={{ marginBottom: '24px', padding: '20px' }}>
+                <BarcodeScanner onScan={handleScanResult} />
+              </div>
+            )}
+
+            <div style={{ display: 'grid', gridTemplateColumns: cartExpanded ? '1fr 400px' : '1fr 350px', gap: '24px' }}>
+              {/* Products Grid */}
+              <div>
+                {/* Category Filter */}
+                <div className="pos-categories" style={{ marginBottom: '20px' }}>
+                  <button
+                    className={`category-chip ${selectedCategory === null ? 'active' : ''}`}
+                    onClick={() => setSelectedCategory(null)}
+                  >
+                    All
+                  </button>
+                  {categories.map(cat => (
+                    <button
+                      key={cat.id}
+                      className={`category-chip ${selectedCategory === cat.id ? 'active' : ''}`}
+                      onClick={() => setSelectedCategory(cat.id)}
+                    >
+                      {cat.name}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Search */}
+                <div style={{ position: 'relative', marginBottom: '20px' }}>
+                  <input
+                    type="text"
+                    className="input"
+                    placeholder="Search products..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    style={{ paddingLeft: '40px' }}
+                  />
+                  <span style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }}>
+                    <Icons.Search />
+                  </span>
+                </div>
+
+                {/* Products Grid */}
+                <div className="pos-product-grid">
+                  {filteredProducts.map(product => (
+                    <div
+                      key={product.id}
+                      className="pos-product-card"
+                      onClick={() => addToCart(product)}
+                      style={{ cursor: product.stock <= 0 ? 'not-allowed' : 'pointer', opacity: product.stock <= 0 ? 0.5 : 1 }}
+                    >
+                      <div className="pos-product-image">
+                        <img src={product.image} alt={product.name} />
+                        {product.stock <= 0 && (
+                          <div className="out-of-stock-overlay">
+                            Out of Stock
+                          </div>
+                        )}
+                        {product.stock > 0 && product.stock <= 10 && (
+                          <div className="low-stock-badge">
+                            Low Stock
+                          </div>
+                        )}
+                      </div>
+                      <div className="pos-product-details">
+                        <h4>{product.name}</h4>
+                        <p className="pos-product-category">{product.category_name}</p>
+                        <div className="pos-product-footer">
+                          <span className="pos-product-price">₦{product.price.toFixed(2)}</span>
+                          <span className="pos-product-stock">{product.stock} in stock</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {filteredProducts.length === 0 && (
+                  <div className="empty-state" style={{ padding: '60px 20px' }}>
+                    <Icons.Package />
+                    <h3>No products found</h3>
+                    <p>Try adjusting your search or category filter</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Shopping Cart */}
+              <div className="pos-cart-container">
+                <div className="glass-card" style={{ padding: 0, height: '100%', display: 'flex', flexDirection: 'column' }}>
+                  {/* Cart Header */}
+                  <div style={{ padding: '20px', borderBottom: '1px solid var(--border-color)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <h3 style={{ margin: 0, background: 'none', WebkitTextFillColor: 'var(--text-primary)' }}>
+                        Shopping Cart
+                      </h3>
+                      <span className="cart-count-badge">{cartCount}</span>
+                    </div>
+                  </div>
+
+                  {/* Cart Items */}
+                  <div style={{ flex: 1, overflowY: 'auto', padding: '16px' }}>
+                    {cart.length === 0 ? (
+                      <div className="empty-state" style={{ padding: '40px 20px' }}>
+                        <Icons.ShoppingCart />
+                        <h4>Cart is empty</h4>
+                        <p>Add products to start a sale</p>
+                      </div>
+                    ) : (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                        {cart.map(item => (
+                          <div key={item.id} className="cart-item">
+                            <img src={item.image} alt={item.name} className="cart-item-image" />
+                            <div className="cart-item-details">
+                              <h5>{item.name}</h5>
+                              <p>₦{item.price.toFixed(2)}</p>
+                            </div>
+                            <div className="cart-item-actions">
+                              <div className="quantity-controls">
+                                <button
+                                  className="quantity-btn"
+                                  onClick={() => updateCartQuantity(item.id, -1)}
+                                  disabled={item.quantity <= 1}
+                                >
+                                  <Icons.Minus />
+                                </button>
+                                <span className="quantity-value">{item.quantity}</span>
+                                <button
+                                  className="quantity-btn"
+                                  onClick={() => updateCartQuantity(item.id, 1)}
+                                  disabled={item.quantity >= item.stock}
+                                >
+                                  <Icons.Plus />
+                                </button>
+                              </div>
+                              <button
+                                className="remove-btn"
+                                onClick={() => removeFromCart(item.id)}
+                              >
+                                <Icons.Trash />
+                              </button>
+                            </div>
+                            <div className="cart-item-total">
+                              ₦{(item.price * item.quantity).toFixed(2)}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Cart Footer */}
+                  {cart.length > 0 && (
+                    <div style={{ padding: '20px', borderTop: '1px solid var(--border-color)' }}>
+                      {/* Totals */}
+                      <div style={{ marginBottom: '16px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                          <span style={{ color: 'var(--text-secondary)' }}>Subtotal</span>
+                          <span style={{ fontWeight: 500 }}>₦{cartTotal.toFixed(2)}</span>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
+                          <span style={{ color: 'var(--text-secondary)' }}>Tax (0%)</span>
+                          <span style={{ fontWeight: 500 }}>₦0.00</span>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: '12px', borderTop: '1px solid var(--border-color)' }}>
+                          <span style={{ fontWeight: 600, fontSize: '1.125rem' }}>Total</span>
+                          <span style={{ fontWeight: 700, fontSize: '1.25rem', color: 'var(--primary)' }}>
+                            ₦{cartTotal.toFixed(2)}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Payment Methods */}
+                      <div style={{ marginBottom: '16px' }}>
+                        <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.875rem', fontWeight: 500 }}>
+                          Payment Method
+                        </label>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                          <button
+                            className="payment-method-btn active"
+                            onClick={(e) => {
+                              document.querySelectorAll('.payment-method-btn').forEach(btn => btn.classList.remove('active'));
+                              e.currentTarget.classList.add('active');
+                            }}
+                          >
+                            Cash
+                          </button>
+                          <button
+                            className="payment-method-btn"
+                            onClick={(e) => {
+                              document.querySelectorAll('.payment-method-btn').forEach(btn => btn.classList.remove('active'));
+                              e.currentTarget.classList.add('active');
+                            }}
+                          >
+                            Card
+                          </button>
+                          <button
+                            className="payment-method-btn"
+                            onClick={(e) => {
+                              document.querySelectorAll('.payment-method-btn').forEach(btn => btn.classList.remove('active'));
+                              e.currentTarget.classList.add('active');
+                            }}
+                          >
+                            Transfer
+                          </button>
+                          <button
+                            className="payment-method-btn"
+                            onClick={(e) => {
+                              document.querySelectorAll('.payment-method-btn').forEach(btn => btn.classList.remove('active'));
+                              e.currentTarget.classList.add('active');
+                            }}
+                          >
+                            Mobile
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Action Buttons */}
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        <button
+                          className="btn btn-secondary"
+                          onClick={() => setCart([])}
+                          style={{ flex: 1 }}
+                        >
+                          Clear
+                        </button>
+                        <button
+                          className="btn btn-primary"
+                          onClick={() => {
+                            const activeMethod = document.querySelector('.payment-method-btn.active');
+                            const paymentMethod = activeMethod?.textContent || 'Cash';
+                            completeSale(paymentMethod);
+                          }}
+                          style={{ flex: 2 }}
+                        >
+                          Complete Sale
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Sales History View */}
+        {activeView === 'sales' && (
+          <div>
+            <div className="page-header">
+              <div className="page-title">
+                <h1>Sales History</h1>
+                <p>View and manage all transactions</p>
+              </div>
+              <button className="btn-export" onClick={() => alert('Export functionality coming soon!')}>
+                <Icons.Download />
+                Export
+              </button>
+            </div>
+
+            <div className="glass-card" style={{ padding: '24px' }}>
+              <table className="data-table-modern">
+                <thead>
+                  <tr>
+                    <th>Sale ID</th>
+                    <th>Date & Time</th>
+                    <th>Payment Method</th>
+                    <th>Items</th>
+                    <th>Total</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {sales.map(sale => (
+                    <tr key={sale.id}>
+                      <td style={{ fontWeight: 600 }}>#{sale.id}</td>
+                      <td>
+                        <div>
+                          <div>{new Date(sale.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</div>
+                          <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                            {new Date(sale.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <span className="status-badge active">
+                          {sale.payment_method}
+                        </span>
+                      </td>
+                      <td>{sale.items?.length || 0} items</td>
+                      <td style={{ fontWeight: 600, fontSize: '1rem' }}>₦{sale.total.toFixed(2)}</td>
+                      <td>
+                        <button
+                          className="btn btn-secondary btn-sm"
+                          onClick={() => {
+                            setCurrentReceipt(sale);
+                            setShowReceipt(true);
+                          }}
+                        >
+                          <Icons.Receipt />
+                          View Receipt
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+
+              {sales.length === 0 && (
+                <div className="empty-state" style={{ padding: '60px 20px' }}>
+                  <Icons.Receipt />
+                  <h3>No sales yet</h3>
+                  <p>Sales will appear here after you complete transactions</p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Categories View */}
         {activeView === 'categories' && (
           <div>
