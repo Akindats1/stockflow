@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import QRCode from 'qrcode';
 import { Html5QrcodeScanner } from 'html5-qrcode';
+import { AuthScreen, useAuth, Business } from './components/Auth';
 
 // Types
 interface Category {
@@ -181,6 +182,21 @@ const Icons = {
       <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" x2="12" y1="15" y2="3" />
     </svg>
   ),
+  Settings: () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" /><circle cx="12" cy="12" r="3" />
+    </svg>
+  ),
+  Users: () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M22 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" />
+    </svg>
+  ),
+  UserPlus: () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><line x1="19" x2="19" y1="8" y2="14" /><line x1="22" x2="16" y1="11" y2="11" />
+    </svg>
+  ),
 };
 
 // API Base URL - in production, this would be your backend server
@@ -217,7 +233,7 @@ const initialSales: Sale[] = [
 
 export default function InventoryApp() {
   // State
-  const [activeView, setActiveView] = useState<'dashboard' | 'products' | 'pos' | 'sales' | 'categories'>('dashboard');
+  const [activeView, setActiveView] = useState<'dashboard' | 'products' | 'pos' | 'sales' | 'categories' | 'settings'>('dashboard');
   const [products, setProducts] = useState<Product[]>(initialProducts);
   const [categories, setCategories] = useState<Category[]>(initialCategories);
   const [sales, setSales] = useState<Sale[]>(initialSales);
@@ -236,6 +252,63 @@ export default function InventoryApp() {
   const [currentReceipt, setCurrentReceipt] = useState<Sale | null>(null);
   const [viewingProduct, setViewingProduct] = useState<Product | null>(null);
   const [showProductDetail, setShowProductDetail] = useState(false);
+  const [showAddUserModal, setShowAddUserModal] = useState(false);
+
+  // Auth Hook
+  const {
+    isAuthenticated,
+    authScreen,
+    setAuthScreen,
+    currentUser,
+    currentBusiness,
+    users,
+    initAuth,
+    refreshUsers,
+    handleRegisterBusiness,
+    handleLogin,
+    handleLogout,
+    handleAddUser,
+    handleDeleteUser,
+  } = useAuth();
+
+  // Initialize auth on mount
+  useEffect(() => {
+    initAuth();
+  }, []);
+
+  // Auth event handlers with toast notifications
+  const onRegister = (business: { name: string; phone: string; email: string; address?: string }, user: { name: string; email: string; password: string }) => {
+    const result = handleRegisterBusiness(business, user);
+    showToast(result.message, result.success ? 'success' : 'error');
+  };
+
+  const onLogin = (email: string, password: string) => {
+    const result = handleLogin(email, password);
+    showToast(result.message, result.success ? 'success' : 'error');
+  };
+
+  const onLogout = () => {
+    const result = handleLogout();
+    showToast(result.message, result.success ? 'success' : 'error');
+  };
+
+  const onAddUser = (userData: { name: string; email: string; password: string; role: 'admin' | 'user' }) => {
+    const result = handleAddUser(userData);
+    showToast(result.message, result.success ? 'success' : 'error');
+    if (result.success) {
+      refreshUsers(); // Ensure users list is refreshed
+    }
+    return result.success;
+  };
+
+  const onDeleteUser = (userId: number) => {
+    const result = handleDeleteUser(userId);
+    showToast(result.message, result.success ? 'success' : 'error');
+    if (result.success) {
+      refreshUsers(); // Ensure users list is refreshed
+    }
+    return result.success;
+  };
 
   // Toast notification
   const showToast = (message: string, type: 'success' | 'error' | 'warning' = 'success') => {
@@ -447,6 +520,19 @@ export default function InventoryApp() {
     }
   };
 
+  // If not authenticated, show auth screen
+  if (!isAuthenticated) {
+    return (
+      <AuthScreen
+        authScreen={authScreen}
+        setAuthScreen={setAuthScreen}
+        onRegister={onRegister}
+        onLogin={onLogin}
+        toasts={toasts}
+      />
+    );
+  }
+
   return (
     <div className="app-container">
       {/* Desktop Sidebar - Hidden on Mobile */}
@@ -454,6 +540,15 @@ export default function InventoryApp() {
         <div className="sidebar-logo">
           <div className="sidebar-logo-icon">S</div>
           <span className="sidebar-logo-text">StockFlow</span>
+        </div>
+
+        {/* Business Info */}
+        <div className="sidebar-business-info">
+          <div className="business-name">{currentBusiness?.name || 'My Business'}</div>
+          <div className="user-info">
+            <span className="user-name">{currentUser?.name}</span>
+            <span className="user-role">{currentUser?.role?.replace('_', ' ')}</span>
+          </div>
         </div>
 
         <nav className="sidebar-nav">
@@ -491,6 +586,26 @@ export default function InventoryApp() {
           >
             <Icons.Tags />
             <span>Categories</span>
+          </button>
+
+          {/* Settings - Super Admin Only */}
+          {currentUser?.role === 'super_admin' && (
+            <button
+              className={`nav-item ${activeView === 'settings' ? 'active' : ''}`}
+              onClick={() => setActiveView('settings')}
+            >
+              <Icons.Settings />
+              <span>Settings</span>
+            </button>
+          )}
+
+          {/* Logout */}
+          <button
+            className="nav-item logout-btn"
+            onClick={onLogout}
+          >
+            <Icons.X />
+            <span>Logout</span>
           </button>
         </nav>
       </aside>
@@ -905,9 +1020,16 @@ export default function InventoryApp() {
               onScan={handleScanResult}
             />
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '24px' }}>
+            <div className="pos-layout" style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 380px',
+              gap: '24px',
+              alignItems: 'start',
+              height: 'calc(100vh - 140px)',
+              overflow: 'hidden'
+            }}>
               {/* Products Grid */}
-              <div>
+              <div style={{ height: '100%', overflowY: 'auto', paddingRight: '12px' }}>
                 {/* Category Filter */}
                 <div className="pos-categories" style={{ marginBottom: '20px' }}>
                   <button
@@ -986,8 +1108,8 @@ export default function InventoryApp() {
               </div>
 
               {/* Shopping Cart */}
-              <div className="pos-cart-container">
-                <div className="glass-card" style={{ padding: 0, height: '100%', display: 'flex', flexDirection: 'column' }}>
+              <div className="pos-cart-container" style={{ height: '100%', overflow: 'hidden' }}>
+                <div className="glass-card" style={{ padding: 0, height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
                   {/* Cart Header */}
                   <div style={{ padding: '20px', borderBottom: '1px solid var(--border-color)' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -999,7 +1121,7 @@ export default function InventoryApp() {
                   </div>
 
                   {/* Cart Items */}
-                  <div style={{ flex: 1, overflowY: 'auto', padding: '16px' }}>
+                  <div style={{ flex: 1, overflowY: 'auto', padding: '16px', minHeight: 0 }}>
                     {cart.length === 0 ? (
                       <div className="empty-state" style={{ padding: '40px 20px' }}>
                         <Icons.ShoppingCart />
@@ -1272,6 +1394,123 @@ export default function InventoryApp() {
             </div>
           </div>
         )}
+
+        {/* Settings View - Super Admin Only */}
+        {activeView === 'settings' && currentUser?.role === 'super_admin' && (
+          <div>
+            <div className="page-header">
+              <div className="page-title">
+                <h1>Settings</h1>
+                <p>Manage your business settings and users</p>
+              </div>
+            </div>
+
+            {/* User Management Section */}
+            <div className="dashboard-section" style={{ marginBottom: '24px' }}>
+              <div className="dashboard-section-header">
+                <h3 className="dashboard-section-title">
+                  <Icons.Users />
+                  <span style={{ marginLeft: '8px' }}>User Management</span>
+                </h3>
+                <button
+                  className="btn btn-primary"
+                  onClick={() => setShowAddUserModal(true)}
+                  style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+                >
+                  <Icons.UserPlus />
+                  Add User
+                </button>
+              </div>
+              <div className="dashboard-section-body">
+                <div className="dashboard-table-container">
+                  <table className="data-table-modern">
+                    <thead>
+                      <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Created</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {users.map(user => (
+                        <tr key={user.id}>
+                          <td>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                              <div style={{
+                                width: '36px',
+                                height: '36px',
+                                borderRadius: '50%',
+                                background: user.role === 'super_admin' ? 'var(--gradient-primary)' : user.role === 'admin' ? 'var(--warning)' : 'var(--info)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                color: 'white',
+                                fontWeight: '600',
+                                fontSize: '0.875rem'
+                              }}>
+                                {user.name.charAt(0).toUpperCase()}
+                              </div>
+                              <span style={{ fontWeight: '500' }}>{user.name}</span>
+                            </div>
+                          </td>
+                          <td>{user.email}</td>
+                          <td>
+                            <span className={`status-badge ${user.role === 'super_admin' ? 'success' : user.role === 'admin' ? 'warning' : 'info'}`}>
+                              {user.role.replace('_', ' ')}
+                            </span>
+                          </td>
+                          <td>{new Date(user.created_at).toLocaleDateString()}</td>
+                          <td>
+                            {user.id !== currentUser?.id ? (
+                              <button
+                                className="btn btn-danger btn-icon"
+                                onClick={() => onDeleteUser(user.id)}
+                                title="Delete User"
+                              >
+                                <Icons.Trash />
+                              </button>
+                            ) : (
+                              <span style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>You</span>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            {/* Business Info Section */}
+            <div className="dashboard-section">
+              <div className="dashboard-section-header">
+                <h3 className="dashboard-section-title">Business Information</h3>
+              </div>
+              <div className="dashboard-section-body">
+                <div className="form-grid" style={{ gap: '16px' }}>
+                  <div className="input-group">
+                    <label>Business Name</label>
+                    <input type="text" className="input" value={currentBusiness?.name || ''} disabled />
+                  </div>
+                  <div className="input-group">
+                    <label>Phone</label>
+                    <input type="text" className="input" value={currentBusiness?.phone || ''} disabled />
+                  </div>
+                  <div className="input-group">
+                    <label>Email</label>
+                    <input type="email" className="input" value={currentBusiness?.email || ''} disabled />
+                  </div>
+                  <div className="input-group">
+                    <label>Address</label>
+                    <input type="text" className="input" value={currentBusiness?.address || 'Not provided'} disabled />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
 
       {/* Product Modal */}
@@ -1310,6 +1549,19 @@ export default function InventoryApp() {
         isOpen={showReceipt}
         onClose={() => setShowReceipt(false)}
         sale={currentReceipt}
+        business={currentBusiness}
+      />
+
+      {/* Add User Modal */}
+      <AddUserModal
+        isOpen={showAddUserModal}
+        onClose={() => setShowAddUserModal(false)}
+        onSave={(userData) => {
+          const success = onAddUser(userData);
+          if (success) {
+            setShowAddUserModal(false);
+          }
+        }}
       />
 
       {/* Product Detail Modal */}
@@ -1932,11 +2184,13 @@ function ScannerModal({
 function ReceiptModal({
   isOpen,
   onClose,
-  sale
+  sale,
+  business
 }: {
   isOpen: boolean;
   onClose: () => void;
   sale: Sale | null;
+  business: Business | null;
 }) {
   const receiptRef = useRef<HTMLDivElement>(null);
 
@@ -2007,12 +2261,18 @@ function ReceiptModal({
             padding: '20px',
             borderRadius: '8px'
           }}>
-            {/* Receipt Header */}
+            {/* Receipt Header - Business Info */}
             <div style={{ textAlign: 'center', marginBottom: '20px', borderBottom: '2px dashed #000', paddingBottom: '10px' }}>
-              <h2 style={{ margin: '0 0 10px 0', fontSize: '24px', color: '#000' }}>StockFlow</h2>
-              <p style={{ margin: '5px 0', fontSize: '12px' }}>Inventory Management System</p>
-              <p style={{ margin: '5px 0', fontSize: '12px' }}>Tel: +234 XXX XXX XXXX</p>
-              <p style={{ margin: '5px 0', fontSize: '12px' }}>Email: sales@stockflow.com</p>
+              <h2 style={{ margin: '0 0 10px 0', fontSize: '24px', color: '#000' }}>{business?.name || 'StockFlow Store'}</h2>
+              {business?.address && (
+                <p style={{ margin: '5px 0', fontSize: '12px' }}>{business.address}</p>
+              )}
+              {business?.phone && (
+                <p style={{ margin: '5px 0', fontSize: '12px' }}>Tel: {business.phone}</p>
+              )}
+              {business?.email && (
+                <p style={{ margin: '5px 0', fontSize: '12px' }}>{business.email}</p>
+              )}
             </div>
 
             {/* Sale Info */}
@@ -2197,6 +2457,142 @@ function BarcodeScanner({
         <div className="modal-footer">
           <button type="button" className="btn btn-secondary" onClick={onClose}>Cancel</button>
         </div>
+      </div>
+    </div>
+  );
+}
+
+// Add User Modal Component
+function AddUserModal({
+  isOpen,
+  onClose,
+  onSave
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  onSave: (data: { name: string; email: string; password: string; role: 'admin' | 'user' }) => void;
+}) {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+    role: 'user' as 'admin' | 'user'
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (formData.password !== formData.confirmPassword) {
+      alert('Passwords do not match');
+      return;
+    }
+    onSave({
+      name: formData.name,
+      email: formData.email,
+      password: formData.password,
+      role: formData.role
+    });
+    // Reset form
+    setFormData({
+      name: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+      role: 'user'
+    });
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="modal-overlay active" onClick={onClose}>
+      <div className="modal" onClick={e => e.stopPropagation()} style={{ maxWidth: '500px' }}>
+        <div className="modal-header">
+          <h3>Add New User</h3>
+          <button className="modal-close" onClick={onClose}>
+            <Icons.X />
+          </button>
+        </div>
+        <form onSubmit={handleSubmit}>
+          <div className="modal-body">
+            <div className="form-grid">
+              <div className="input-group" style={{ gridColumn: 'span 2' }}>
+                <label>Full Name *</label>
+                <input
+                  type="text"
+                  className="input"
+                  value={formData.name}
+                  onChange={e => setFormData({ ...formData, name: e.target.value })}
+                  placeholder="Enter user's full name"
+                  required
+                />
+              </div>
+              <div className="input-group" style={{ gridColumn: 'span 2' }}>
+                <label>Email Address *</label>
+                <input
+                  type="email"
+                  className="input"
+                  value={formData.email}
+                  onChange={e => setFormData({ ...formData, email: e.target.value })}
+                  placeholder="Enter user's email"
+                  required
+                />
+              </div>
+              <div className="input-group">
+                <label>Password *</label>
+                <input
+                  type="password"
+                  className="input"
+                  value={formData.password}
+                  onChange={e => setFormData({ ...formData, password: e.target.value })}
+                  placeholder="Create password"
+                  required
+                  minLength={6}
+                />
+              </div>
+              <div className="input-group">
+                <label>Confirm Password *</label>
+                <input
+                  type="password"
+                  className="input"
+                  value={formData.confirmPassword}
+                  onChange={e => setFormData({ ...formData, confirmPassword: e.target.value })}
+                  placeholder="Confirm password"
+                  required
+                />
+              </div>
+              <div className="input-group" style={{ gridColumn: 'span 2' }}>
+                <label>Role *</label>
+                <select
+                  className="input select"
+                  value={formData.role}
+                  onChange={e => setFormData({ ...formData, role: e.target.value as 'admin' | 'user' })}
+                >
+                  <option value="user">User - Basic access, can make sales</option>
+                  <option value="admin">Admin - Full access except user management</option>
+                </select>
+              </div>
+            </div>
+            <div style={{
+              marginTop: '16px',
+              padding: '12px',
+              background: 'var(--bg-secondary)',
+              borderRadius: '8px',
+              fontSize: '0.875rem',
+              color: 'var(--text-secondary)'
+            }}>
+              <strong>Role Permissions:</strong>
+              <ul style={{ marginTop: '8px', paddingLeft: '20px' }}>
+                <li><strong>User:</strong> Point of Sale, View Products, View Sales</li>
+                <li><strong>Admin:</strong> All features except Settings/User Management</li>
+              </ul>
+            </div>
+          </div>
+          <div className="modal-footer">
+            <button type="button" className="btn btn-secondary" onClick={onClose}>Cancel</button>
+            <button type="submit" className="btn btn-primary">Add User</button>
+          </div>
+        </form>
       </div>
     </div>
   );
