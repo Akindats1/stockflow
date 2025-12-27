@@ -106,6 +106,21 @@ const Icons = {
       <path d="M3 6h18" /><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" /><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
     </svg>
   ),
+  Eye: () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" /><circle cx="12" cy="12" r="3" />
+    </svg>
+  ),
+  ChevronRight: () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="m9 18 6-6-6-6" />
+    </svg>
+  ),
+  ArrowLeft: () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="m12 19-7-7 7-7" /><path d="M19 12H5" />
+    </svg>
+  ),
   X: () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M18 6 6 18" /><path d="m6 6 12 12" />
@@ -217,6 +232,7 @@ const initialProducts: Product[] = [
   { id: 23, name: 'Plastic Cooler 50L', sku: 'PLC-CLR-50', category_id: 4, category_name: 'Home & Garden', price: 8500, cost: 6000, stock: 18, image: '/images/products/led-desk-lamp.png', created_at: new Date().toISOString() },
   { id: 24, name: 'Indomie Noodles Carton (40 pcs)', sku: 'IND-NDL-C40', category_id: 3, category_name: 'Food & Drinks', price: 5200, cost: 4500, stock: 35, image: '/images/products/protein-bar.png', created_at: new Date().toISOString() },
   { id: 25, name: 'Palm Oil 5 Litres', sku: 'PLM-OIL-005', category_id: 3, category_name: 'Food & Drinks', price: 6500, cost: 5500, stock: 28, image: '/images/products/protein-bar.png', created_at: new Date().toISOString() },
+
 ];
 
 const initialSales: Sale[] = [
@@ -244,6 +260,8 @@ export default function InventoryApp() {
   const [showScanner, setShowScanner] = useState(false);
   const [showReceipt, setShowReceipt] = useState(false);
   const [currentReceipt, setCurrentReceipt] = useState<Sale | null>(null);
+  const [viewingProduct, setViewingProduct] = useState<Product | null>(null);
+  const [showProductDetail, setShowProductDetail] = useState(false);
 
   // Toast notification
   const showToast = (message: string, type: 'success' | 'error' | 'warning' = 'success') => {
@@ -722,150 +740,126 @@ export default function InventoryApp() {
         {/* Products View */}
         {
           activeView === 'products' && (
-            <div>
-              <div className="page-header">
-                <div className="page-title">
-                  <h1>Products</h1>
-                  <p>Manage your inventory</p>
-                </div>
-                <div style={{ display: 'flex', gap: '8px' }}>
-                  <button className="btn-export" onClick={() => alert('Export functionality coming soon!')}>
+            <div className="products-page">
+              {/* Page Header */}
+              <div className="products-header">
+                <h1 className="products-title">Products</h1>
+                <div className="products-header-actions">
+                  <button className="btn-outline" onClick={() => alert('Export functionality coming soon!')}>
                     <Icons.Download />
                     Export
                   </button>
-                  <button className="btn btn-primary" onClick={() => { setEditingProduct(null); setShowModal(true); }}>
-                    <Icons.Plus /> New Product
+                  <button className="btn-filled" onClick={() => { setEditingProduct(null); setShowModal(true); }}>
+                    New product
                   </button>
                 </div>
               </div>
 
-              {/* Table Container */}
-              <div className="products-table-container">
-                {/* Table Header Controls */}
-                <div className="table-header-controls">
-                  <div className="table-search-container">
-                    <div style={{ position: 'relative', flex: '1', maxWidth: '400px' }}>
-                      <input
-                        type="text"
-                        className="input"
-                        placeholder="Search products..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        style={{ paddingLeft: '40px' }}
-                      />
-                      <span style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }}>
-                        <Icons.Search />
-                      </span>
-                    </div>
-                    <button className="filter-toggle">
-                      Filters
-                      <span style={{ fontSize: '10px' }}>▾</span>
-                    </button>
-                  </div>
-                  <div className="pos-categories" style={{ flex: '1', justifyContent: 'flex-start' }}>
-                    <button
-                      className={`category-chip ${selectedCategory === null ? 'active' : ''}`}
-                      onClick={() => setSelectedCategory(null)}
-                    >
-                      All
-                    </button>
-                    {categories.map(cat => (
-                      <button
-                        key={cat.id}
-                        className={`category-chip ${selectedCategory === cat.id ? 'active' : ''}`}
-                        onClick={() => setSelectedCategory(cat.id)}
-                      >
-                        {cat.name}
-                      </button>
-                    ))}
-                  </div>
+              {/* Search and Filters */}
+              <div className="products-toolbar">
+                <div className="search-wrapper">
+                  <Icons.Search />
+                  <input
+                    type="text"
+                    placeholder="Search..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
                 </div>
+                <button className="filter-btn">
+                  Filters
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="m6 9 6 6 6-6" />
+                  </svg>
+                </button>
+                {selectedCategory !== null && (
+                  <div className="active-filter">
+                    Status: {categories.find(c => c.id === selectedCategory)?.name}
+                    <button onClick={() => setSelectedCategory(null)}>×</button>
+                  </div>
+                )}
+              </div>
 
-                {/* Products Table */}
-                <table className="data-table-modern">
+              {/* Products Table Container */}
+              <div className="products-table-wrapper">
+                <table className="products-table">
                   <thead>
                     <tr>
-                      <th>
-                        <input type="checkbox" className="table-checkbox" />
+                      <th className="th-checkbox">
+                        <input type="checkbox" />
                       </th>
-                      <th>Product</th>
+                      <th className="th-product">Product Name</th>
                       <th>Category</th>
                       <th>SKU</th>
-                      <th>Price</th>
                       <th>Stock</th>
+                      <th>Price</th>
                       <th>Status</th>
-                      <th></th>
+                      <th className="th-actions"></th>
                     </tr>
                   </thead>
                   <tbody>
                     {filteredProducts.map(product => (
-                      <tr key={product.id}>
-                        <td>
-                          <input type="checkbox" className="table-checkbox" />
+                      <tr
+                        key={product.id}
+                        onClick={() => { setViewingProduct(product); setShowProductDetail(true); }}
+                      >
+                        <td className="td-checkbox" onClick={(e) => e.stopPropagation()}>
+                          <input type="checkbox" />
                         </td>
-                        <td>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                            <img
-                              src={product.image}
-                              alt={product.name}
-                              className="product-thumbnail"
-                            />
-                            <span style={{ fontWeight: 500 }}>{product.name}</span>
+                        <td className="td-product">
+                          <div className="product-cell">
+                            <div className="product-img">
+                              <img src={product.image} alt={product.name} />
+                            </div>
+                            <span className="product-name">{product.name}</span>
                           </div>
                         </td>
-                        <td>
-                          <span style={{
-                            textTransform: 'uppercase',
-                            fontSize: '0.75rem',
-                            fontWeight: 600,
-                            color: 'var(--text-secondary)'
-                          }}>
-                            {product.category_name}
-                          </span>
+                        <td className="td-category">{product.category_name}</td>
+                        <td className="td-sku">{product.sku}</td>
+                        <td className="td-stock">
+                          <div className="stock-cell">
+                            <span className="stock-qty">{product.stock}</span>
+                            <span className="stock-label">in stock</span>
+                          </div>
                         </td>
-                        <td style={{ color: 'var(--text-secondary)' }}>{product.sku}</td>
-                        <td style={{ fontWeight: 600 }}>₦{product.price.toFixed(2)}</td>
-                        <td>{product.stock} units</td>
-                        <td>
-                          <span className={`status-badge ${product.stock <= 0 ? 'out-of-stock' : product.stock <= 10 ? 'low-stock' : 'active'}`}>
+                        <td className="td-price">₦{product.price.toLocaleString()}</td>
+                        <td className="td-status">
+                          <span className={`status-pill ${product.stock <= 0 ? 'out-of-stock' : product.stock <= 10 ? 'low-stock' : 'active'}`}>
                             {product.stock <= 0 ? 'Out of Stock' : product.stock <= 10 ? 'Low Stock' : 'Active'}
                           </span>
                         </td>
-                        <td>
-                          <div className="table-action-menu">
-                            <button
-                              className="action-menu-trigger"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                const menu = e.currentTarget.nextElementSibling as HTMLElement;
-                                menu?.classList.toggle('active');
-                              }}
-                            >
-                              ⋮
+                        <td className="td-actions" onClick={(e) => e.stopPropagation()}>
+                          <button
+                            className="action-dots"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              const menu = e.currentTarget.nextElementSibling as HTMLElement;
+                              // Close all other menus first
+                              document.querySelectorAll('.action-dropdown.show').forEach(el => {
+                                if (el !== menu) el.classList.remove('show');
+                              });
+                              menu?.classList.toggle('show');
+                            }}
+                          >
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                              <circle cx="12" cy="5" r="2" />
+                              <circle cx="12" cy="12" r="2" />
+                              <circle cx="12" cy="19" r="2" />
+                            </svg>
+                          </button>
+                          <div className="action-dropdown">
+                            <button onClick={() => { setViewingProduct(product); setShowProductDetail(true); }}>
+                              <Icons.Eye /> View
                             </button>
-                            <div className="action-menu-dropdown">
-                              <button
-                                className="action-menu-item"
-                                onClick={() => { setEditingProduct(product); setShowModal(true); }}
-                              >
-                                <Icons.Edit />
-                                Edit
-                              </button>
-                              <button
-                                className="action-menu-item"
-                                onClick={() => handleShowQR(product)}
-                              >
-                                <Icons.QrCode />
-                                QR Code
-                              </button>
-                              <button
-                                className="action-menu-item danger"
-                                onClick={() => handleDeleteProduct(product.id)}
-                              >
-                                <Icons.Trash />
-                                Delete
-                              </button>
-                            </div>
+                            <button onClick={() => { setEditingProduct(product); setShowModal(true); }}>
+                              <Icons.Edit /> Edit
+                            </button>
+                            <button onClick={() => handleShowQR(product)}>
+                              <Icons.QrCode /> QR Code
+                            </button>
+                            <button className="danger" onClick={() => handleDeleteProduct(product.id)}>
+                              <Icons.Trash /> Delete
+                            </button>
                           </div>
                         </td>
                       </tr>
@@ -874,30 +868,39 @@ export default function InventoryApp() {
                 </table>
 
                 {filteredProducts.length === 0 && (
-                  <div className="empty-state" style={{ padding: '60px 20px' }}>
+                  <div className="empty-table">
                     <Icons.Package />
                     <h3>No products found</h3>
                     <p>Try adjusting your search or add a new product</p>
-                  </div>
-                )}
-
-                {/* Pagination */}
-                {filteredProducts.length > 0 && (
-                  <div className="pagination">
-                    <button className="pagination-button" disabled>
-                      ←
-                    </button>
-                    <button className="pagination-button active">1</button>
-                    <button className="pagination-button">2</button>
-                    <button className="pagination-button">3</button>
-                    <span style={{ padding: '0 8px', color: 'var(--text-muted)' }}>...</span>
-                    <button className="pagination-button">{Math.ceil(filteredProducts.length / 10)}</button>
-                    <button className="pagination-button">
-                      →
+                    <button className="btn-filled" onClick={() => { setEditingProduct(null); setShowModal(true); }}>
+                      Add Product
                     </button>
                   </div>
                 )}
               </div>
+
+              {/* Pagination */}
+              {filteredProducts.length > 0 && (
+                <div className="products-pagination">
+                  <button className="page-btn" disabled>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="m15 18-6-6 6-6" />
+                    </svg>
+                  </button>
+                  <button className="page-num active">1</button>
+                  <button className="page-num">2</button>
+                  <button className="page-num">3</button>
+                  <button className="page-num">4</button>
+                  <button className="page-num">5</button>
+                  <span className="page-dots">...</span>
+                  <button className="page-num">{Math.ceil(filteredProducts.length / 10) || 1}</button>
+                  <button className="page-btn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="m9 18 6-6-6-6" />
+                    </svg>
+                  </button>
+                </div>
+              )}
             </div>
           )
         }
@@ -1334,6 +1337,110 @@ export default function InventoryApp() {
         onClose={() => setShowReceipt(false)}
         sale={currentReceipt}
       />
+
+      {/* Product Detail Modal */}
+      {showProductDetail && viewingProduct && (
+        <div className="modal-overlay active" onClick={() => setShowProductDetail(false)}>
+          <div className="modal product-detail-modal" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Product Details</h3>
+              <button className="modal-close" onClick={() => setShowProductDetail(false)}>
+                <Icons.X />
+              </button>
+            </div>
+            <div className="modal-body">
+              <div className="product-detail-content">
+                {/* Product Image */}
+                <div className="product-detail-image">
+                  <img src={viewingProduct.image} alt={viewingProduct.name} />
+                  <div className={`product-detail-status ${viewingProduct.stock <= 0 ? 'out-of-stock' : viewingProduct.stock <= 10 ? 'low-stock' : 'in-stock'}`}>
+                    {viewingProduct.stock <= 0 ? 'Out of Stock' : viewingProduct.stock <= 10 ? 'Low Stock' : 'In Stock'}
+                  </div>
+                </div>
+
+                {/* Product Info */}
+                <div className="product-detail-info">
+                  <h2 className="product-detail-name">{viewingProduct.name}</h2>
+                  <div className="product-detail-sku">SKU: {viewingProduct.sku}</div>
+
+                  <div className="product-detail-category">
+                    <span
+                      className="category-badge"
+                      style={{
+                        backgroundColor: `${categories.find(c => c.id === viewingProduct.category_id)?.color}20`,
+                        color: categories.find(c => c.id === viewingProduct.category_id)?.color
+                      }}
+                    >
+                      {viewingProduct.category_name}
+                    </span>
+                  </div>
+
+                  <div className="product-detail-pricing">
+                    <div className="pricing-item">
+                      <span className="pricing-label">Selling Price</span>
+                      <span className="pricing-value">₦{viewingProduct.price.toLocaleString()}</span>
+                    </div>
+                    <div className="pricing-item">
+                      <span className="pricing-label">Cost Price</span>
+                      <span className="pricing-value cost">₦{viewingProduct.cost.toLocaleString()}</span>
+                    </div>
+                    <div className="pricing-item">
+                      <span className="pricing-label">Profit Margin</span>
+                      <span className="pricing-value profit">
+                        ₦{(viewingProduct.price - viewingProduct.cost).toLocaleString()}
+                        <small> ({((viewingProduct.price - viewingProduct.cost) / viewingProduct.price * 100).toFixed(1)}%)</small>
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="product-detail-stock">
+                    <div className="stock-level">
+                      <span className="stock-label">Current Stock</span>
+                      <span className={`stock-value ${viewingProduct.stock <= 0 ? 'out' : viewingProduct.stock <= 10 ? 'low' : 'good'}`}>
+                        {viewingProduct.stock} units
+                      </span>
+                    </div>
+                    <div className="stock-info">
+                      <span className="stock-label">Stock Value</span>
+                      <span className="stock-value">₦{(viewingProduct.stock * viewingProduct.cost).toLocaleString()}</span>
+                    </div>
+                  </div>
+
+                  <div className="product-detail-date">
+                    <span className="date-label">Added on:</span>
+                    <span className="date-value">{new Date(viewingProduct.created_at).toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric'
+                    })}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="modal-footer product-detail-actions">
+              <button
+                className="btn btn-secondary"
+                onClick={() => { setShowProductDetail(false); setEditingProduct(viewingProduct); setShowModal(true); }}
+              >
+                <Icons.Edit /> Edit Product
+              </button>
+              <button
+                className="btn btn-secondary"
+                onClick={() => handleShowQR(viewingProduct)}
+              >
+                <Icons.QrCode /> Show QR Code
+              </button>
+              <button
+                className="btn btn-primary"
+                onClick={() => { addToCart(viewingProduct); setShowProductDetail(false); setActiveView('pos'); }}
+                disabled={viewingProduct.stock <= 0}
+              >
+                <Icons.ShoppingCart /> Add to Cart
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Toast Notifications */}
       <div className="toast-container">
